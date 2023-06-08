@@ -1199,7 +1199,7 @@ Transform:
   m_Children:
   - {fileID: 7581854223329533323}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7794279956762562392
 MeshFilter:
@@ -1280,7 +1280,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7794279956762562397}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 80
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -1295,9 +1295,9 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!114 &-3148139872234078989
 MonoBehaviour:
@@ -1342,9 +1342,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9da53d1598cc19489d546bf994038cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 20
+  acceleration: 350
+  deceleration: 350
+  maxSpeed: 20
   sensitivity: 0.1
-  _cinemachineVirtualCamera: {fileID: 5467027810233215775}
+  cinemachineVirtualCamera: {fileID: 5467027810233215775}
 --- !u!114 &1027881395623937880
 MonoBehaviour:
   m_ObjectHideFlags: 0

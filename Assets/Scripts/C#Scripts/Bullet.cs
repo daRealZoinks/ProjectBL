@@ -4,9 +4,9 @@ public class Bullet : MonoBehaviour
 {
     [SerializeField] private float _destroyDelay = 5f;
 
-    public Rigidbody Rigidbody { get; private set; }
+    private float _destroyTimer;
 
-    private float _destroyTimer = 0f;
+    public Rigidbody Rigidbody { get; private set; }
 
     private void Awake()
     {
@@ -17,10 +17,7 @@ public class Bullet : MonoBehaviour
     {
         _destroyTimer += Time.deltaTime;
 
-        if (_destroyTimer >= _destroyDelay)
-        {
-            Destroy(gameObject);
-        }
+        if (_destroyTimer >= _destroyDelay) Destroy(gameObject);
     }
 
     private void OnCollisionEnter(Collision collision)

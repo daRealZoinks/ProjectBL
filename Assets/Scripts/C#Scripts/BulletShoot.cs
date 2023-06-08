@@ -7,7 +7,7 @@ public class BulletShoot : MonoBehaviour
     [SerializeField] private float _shootDelay = 2f;
     [SerializeField] private float _shootForce = 10f;
 
-    private float _shootTimer = 0f;
+    private float _shootTimer;
 
     private void Update()
     {
