@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] private float _destroyDelay = 5f;
+    [SerializeField] private float destroyDelay = 5f;
 
     private float _destroyTimer;
 
@@ -17,7 +17,7 @@ public class Bullet : MonoBehaviour
     {
         _destroyTimer += Time.deltaTime;
 
-        if (_destroyTimer >= _destroyDelay) Destroy(gameObject);
+        if (_destroyTimer >= destroyDelay) Destroy(gameObject);
     }
 
     private void OnCollisionEnter(Collision collision)
