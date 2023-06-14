@@ -1,6 +1,7 @@
 using Cinemachine;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerCharacterController : MonoBehaviour
 {
     [Header("Movement")]
@@ -10,16 +11,16 @@ public class PlayerCharacterController : MonoBehaviour
 
     [Space]
     [Header("Jump")]
-    [SerializeField] private float maxAirSpeed = 20f; // m/s
     [SerializeField] private float jumpHeight = 3f; // m
     [SerializeField] private float airControl = 0.05f; // 0-1 (0 = no control, 1 = full control)
-    [SerializeField] private float airBrake = 0f; // 0-1 (0 = no brake, 1 = full brake)
+    [SerializeField] private float airBrake; // 0-1 (0 = no brake, 1 = full brake)
+    [SerializeField] private float groundCheckDistance = 1.5f; // m
     [SerializeField] private LayerMask groundLayerMask;
 
     [Space]
     [Header("Camera")]
     [SerializeField] private float sensitivity = 0.1f;
-    [SerializeField] private CinemachineVirtualCamera cinemachineVirtualCamera;
+    [SerializeField] private CinemachineVirtualCamera virtualCamera;
 
     private Rigidbody _rigidbody;
     private float _xRotation;
@@ -28,6 +29,14 @@ public class PlayerCharacterController : MonoBehaviour
     public Vector2 Direction { get; set; }
     public Vector2 Look { get; set; }
     public bool Jumping { get; set; }
+    public bool Grounded
+    {
+        get => _grounded;
+        set
+        {
+            _grounded = value;
+        }
+    }
 
     private void Awake()
     {
@@ -66,7 +75,7 @@ public class PlayerCharacterController : MonoBehaviour
         _xRotation -= Look.y * sensitivity;
         _xRotation = Mathf.Clamp(_xRotation, -90f, 90f);
 
-        cinemachineVirtualCamera.transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
+        virtualCamera.transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
         _rigidbody.MoveRotation(transform.rotation * Quaternion.Euler(0f, Look.x * sensitivity, 0f));
     }
 
@@ -76,24 +85,50 @@ public class PlayerCharacterController : MonoBehaviour
         var horizontalVelocity = new Vector3(velocity.x, 0f, velocity.z);
 
         var playerTransform = transform;
-        var finalDirection = Direction.x * playerTransform.right + playerTransform.forward * Direction.y;
+        var playerDirection = Direction.x * playerTransform.right + playerTransform.forward * Direction.y;
+        playerDirection.Normalize();
 
-        var finalForce = finalDirection != Vector3.zero ? finalDirection * acceleration : -horizontalVelocity * deceleration;
+        var finalForce = Vector3.zero;
 
-        finalForce *= finalDirection != Vector3.zero ? _grounded ? 1f : airControl : _grounded ? 1f : airBrake;
-
-        // we should do this in another way
-        if (_grounded)
+        if (playerDirection != Vector3.zero)
         {
-            // we will calculate the direction of the horizontal velocity
-            // then we will subtract it from the final force so that we don't exceed the max speed
+            var movementForce = playerDirection * acceleration;
 
-            if (horizontalVelocity.magnitude > maxSpeed)
+            if (_grounded)
             {
-                horizontalVelocity = horizontalVelocity.normalized * maxSpeed;
-                _rigidbody.velocity = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
+                if (horizontalVelocity.magnitude <= maxSpeed)
+                {
+                    finalForce += movementForce;
+                }
+                else
+                {
+                    finalForce += (playerDirection - horizontalVelocity.normalized) * acceleration;
+                }
+            }
+            else
+            {
+                movementForce *= airControl;
+                finalForce += movementForce;
             }
         }
+        else
+        {
+            var breakingForce = -horizontalVelocity * deceleration;
+
+            if (!_grounded)
+            {
+                breakingForce *= airBrake;
+            }
+
+            finalForce += breakingForce;
+        }
+
+        //use debug draw rays to visualize the forces
+
+        Debug.DrawRay(transform.position, playerDirection * 3, Color.red);
+        Debug.DrawRay(transform.position, horizontalVelocity * 0.1f, Color.blue);
+        Debug.DrawRay(transform.position, -horizontalVelocity * 0.1f, Color.yellow);
+        Debug.DrawRay(transform.position, finalForce, Color.magenta);
 
         _rigidbody.AddForce(finalForce * Time.fixedDeltaTime, ForceMode.Acceleration);
     }
@@ -103,12 +138,5 @@ public class PlayerCharacterController : MonoBehaviour
         var jumpForce = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
         _rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
         Jumping = false;
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        var playerTransform = transform;
-        Gizmos.DrawRay(playerTransform.position, Direction.x * playerTransform.right + Direction.y * playerTransform.forward);
     }
 }

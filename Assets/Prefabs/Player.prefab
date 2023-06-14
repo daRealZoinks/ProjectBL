@@ -44,6 +44,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac0b09e7857660247b1477e93731de29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &6736983356641333367
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4463098783225668460}
+  m_Layer: 0
+  m_Name: GroundCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4463098783225668460
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6736983356641333367}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7794279956762562393}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7794279956762562397
 GameObject:
   m_ObjectHideFlags: 0
@@ -57,7 +88,6 @@ GameObject:
   - component: {fileID: 5753339366875455905}
   - component: {fileID: -3148139872234078989}
   - component: {fileID: -4509371769481015721}
-  - component: {fileID: 1027881395623937880}
   - component: {fileID: 3860522599735954772}
   - component: {fileID: 9015243134225250949}
   m_Layer: 0
@@ -81,8 +111,9 @@ Transform:
   m_Children:
   - {fileID: 7581854223329533323}
   - {fileID: 6772598001833017822}
+  - {fileID: 4463098783225668460}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &2863225364790562571
 CapsuleCollider:
@@ -180,31 +211,15 @@ MonoBehaviour:
   acceleration: 5120
   deceleration: 800
   maxSpeed: 15
-  maxAirSpeed: 20
   jumpHeight: 3
   airControl: 0.05
   airBrake: 0
+  groundCheckDistance: 1.5
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 64
   sensitivity: 0.1
-  cinemachineVirtualCamera: {fileID: 5467027810233215775}
---- !u!114 &1027881395623937880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7794279956762562397}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b18b7b7a1c8d8ab49b2827ee4ea9d249, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bullet: {fileID: 0}
-  shootPoint: {fileID: 0}
-  shootDelay: 1
-  shootForce: 100
+  virtualCamera: {fileID: 5467027810233215775}
 --- !u!114 &3860522599735954772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,8 +233,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data:
-    _json: '{"declarations":{"Kind":"Object","collection":{"$content":[{"name":"MouseLook","value":{"$type":"Unity.VisualScripting.Unknown"},"typeHandle":{"Identification":"MouseLook,
-      Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$version":"A"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
+    _json: '{"declarations":{"Kind":"Object","collection":{"$content":[],"$version":"A"},"$version":"A"}}'
     _objectReferences: []
 --- !u!114 &9015243134225250949
 MonoBehaviour:
