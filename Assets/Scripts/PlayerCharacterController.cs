@@ -1,54 +1,55 @@
 using Cinemachine;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerCharacterController : MonoBehaviour
 {
     [Header("Movement")]
+    [Tooltip("The acceleration of the player in m/s^2")]
     [SerializeField] private float acceleration = 5120; // m/s^2
+    [Tooltip("The deceleration of the player in m/s^2")]
     [SerializeField] private float deceleration = 800f; // m/s^2
+    [Tooltip("The maximum speed of the player in m/s")]
     [SerializeField] private float maxSpeed = 15; // m/s
 
     [Space]
     [Header("Jump")]
+    [Tooltip("The height of the player's jump in m")]
     [SerializeField] private float jumpHeight = 3f; // m
+    [Tooltip("The amount of control the player has in the air")]
     [SerializeField] private float airControl = 0.05f; // 0-1 (0 = no control, 1 = full control)
+    [Tooltip("The amount of air braking the player has")]
     [SerializeField] private float airBrake; // 0-1 (0 = no brake, 1 = full brake)
-    [SerializeField] private float groundCheckDistance = 1.5f; // m
+    [Tooltip("The layer mask for the ground")]
     [SerializeField] private LayerMask groundLayerMask;
-
-    [Space]
-    [Header("Camera")]
-    [SerializeField] private float sensitivity = 0.1f;
-    [SerializeField] private CinemachineVirtualCamera virtualCamera;
-
+    
     private Rigidbody _rigidbody;
-    private float _xRotation;
     private bool _grounded;
 
     public Vector2 Direction { get; set; }
-    public Vector2 Look { get; set; }
     public bool Jumping { get; set; }
-    public bool Grounded
-    {
-        get => _grounded;
-        set
-        {
-            _grounded = value;
-        }
-    }
+
+    // Events
+    public event UnityAction OnJump;
+    public event UnityAction<float> OnLand;
+    
+    // Properties
+    public Vector3 Movement => _rigidbody.velocity;
+    public bool Grounded => _grounded;
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        OnJump += Jump;
     }
 
     private void OnCollisionStay(Collision other)
     {
-        if (groundLayerMask == (groundLayerMask | (1 << other.gameObject.layer)))
-        {
-            _grounded = true;
-        }
+        if (groundLayerMask != (groundLayerMask | (1 << other.gameObject.layer))) return;
+        
+        _grounded = true;
+        OnLand?.Invoke(other.impulse.magnitude);
     }
 
     private void OnCollisionExit(Collision other)
@@ -59,24 +60,12 @@ public class PlayerCharacterController : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
-
     private void Update()
     {
         if (Jumping && _grounded)
         {
-            Jump();
+            OnJump?.Invoke();
         }
-
-        _xRotation -= Look.y * sensitivity;
-        _xRotation = Mathf.Clamp(_xRotation, -90f, 90f);
-
-        virtualCamera.transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
-        _rigidbody.MoveRotation(transform.rotation * Quaternion.Euler(0f, Look.x * sensitivity, 0f));
     }
 
     private void FixedUpdate()
@@ -122,13 +111,6 @@ public class PlayerCharacterController : MonoBehaviour
 
             finalForce += breakingForce;
         }
-
-        //use debug draw rays to visualize the forces
-
-        Debug.DrawRay(transform.position, playerDirection * 3, Color.red);
-        Debug.DrawRay(transform.position, horizontalVelocity * 0.1f, Color.blue);
-        Debug.DrawRay(transform.position, -horizontalVelocity * 0.1f, Color.yellow);
-        Debug.DrawRay(transform.position, finalForce, Color.magenta);
 
         _rigidbody.AddForce(finalForce * Time.fixedDeltaTime, ForceMode.Acceleration);
     }
