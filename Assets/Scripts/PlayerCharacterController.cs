@@ -37,6 +37,8 @@ public class PlayerCharacterController : MonoBehaviour
     // Properties
     public Vector3 Movement => _rigidbody.velocity;
     public bool Grounded => _grounded;
+    public float MaxSpeed => maxSpeed;
+    public bool Stopping => Direction == Vector2.zero;
 
     private void Awake()
     {

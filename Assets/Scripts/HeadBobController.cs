@@ -1,4 +1,3 @@
-using Cinemachine;
 using UnityEngine;
 
 public class HeadBobController : MonoBehaviour
@@ -7,63 +6,54 @@ public class HeadBobController : MonoBehaviour
 
     [Header("Bobbing")]
     [Tooltip("The amount of bobbing when the player is moving")]
-    [SerializeField, Range(0, 0.1f)] private float amplitude = 0.015f;
+    [SerializeField, Range(0, 0.1f)] private float amplitude = 0.08f;
     [Tooltip("The speed of the bobbing when the player is moving")]
-    [SerializeField, Range(0, 30f)] private float frequency = 10f;
+    [SerializeField, Range(0, 30f)] private float frequency = 17.5f;
 
-    [SerializeField] private CinemachineVirtualCamera _camera = null;
+    [SerializeField] private PlayerCharacterController playerCharacterController;
 
-    private float _toggleSpeed = 3f;
     private Vector3 _startPosition;
-    private PlayerCharacterController _playerCharacterController;
+
+    public bool HeadBobEnabled
+    {
+        get => headBobEnabled;
+        set => headBobEnabled = value;
+    }
 
     private void Awake()
     {
-        _playerCharacterController = GetComponent<PlayerCharacterController>();
-        _startPosition = _camera.transform.localPosition;
+        _startPosition = transform.localPosition;
     }
 
     private void Update()
     {
-        if (!headBobEnabled) return;
-        CheckMotion();
-        ResetPosition();
-        _camera.transform.LookAt(FocusTarget());
+        if (!headBobEnabled || !playerCharacterController.Grounded) return;
+
+        if (playerCharacterController.Movement.magnitude > 0)
+        {
+            var speed = Mathf.Clamp01(playerCharacterController.Movement.magnitude / playerCharacterController.MaxSpeed);
+            transform.localPosition = _startPosition + GetHeadBobPosition(speed);
+
+            var targetPosition = playerCharacterController.transform.position;
+            targetPosition.y += transform.localPosition.y;
+            targetPosition += transform.forward * 2;
+
+            transform.LookAt(targetPosition);
+        }
+
+        if (playerCharacterController.Stopping)
+        {
+            transform.localPosition = Vector3.Lerp(transform.localPosition, _startPosition, Time.deltaTime);
+        }
     }
 
-    private void PlayMotion(Vector3 motion)
+    public Vector3 GetHeadBobPosition(float speed)
     {
-        _camera.transform.localPosition = _startPosition + motion;
-    }
+        var position = new Vector3(
+            Mathf.Cos(Time.time * frequency / 2) * amplitude * 2,
+            Mathf.Sin(Time.time * frequency) * amplitude,
+            0);
 
-    private void CheckMotion()
-    {
-        float speed = _playerCharacterController.Movement.magnitude;
-
-        if (speed < _toggleSpeed) return;
-        if (!_playerCharacterController.Grounded) return;
-
-        PlayMotion(FootStepMotion());
-    }
-
-    private Vector3 FootStepMotion()
-    {
-        Vector3 position = Vector3.zero;
-        position.y = Mathf.Sin(Time.time * frequency) * amplitude;
-        position.x = Mathf.Cos(Time.time * frequency / 2) * amplitude * 2;
-        return position;
-    }
-
-    private void ResetPosition()
-    {
-        if (_camera.transform.localPosition == _startPosition) return;
-        _camera.transform.localPosition = Vector3.Lerp(_camera.transform.localPosition, _startPosition, Time.deltaTime);
-    }
-
-    private Vector3 FocusTarget()
-    {
-        Vector3 position = new Vector3(transform.position.x, transform.position.y + _camera.transform.localPosition.y, transform.position.z);
-        position += _camera.transform.forward * 2;
-        return position;
+        return position * speed;
     }
 }
