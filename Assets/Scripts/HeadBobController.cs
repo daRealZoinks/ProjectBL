@@ -13,6 +13,7 @@ public class HeadBobController : MonoBehaviour
     [SerializeField] private PlayerCharacterController playerCharacterController;
 
     private Vector3 _startPosition;
+    private Vector3 _targetLookAtPosition;
 
     public bool HeadBobEnabled
     {
@@ -27,23 +28,18 @@ public class HeadBobController : MonoBehaviour
 
     private void Update()
     {
-        if (!headBobEnabled || !playerCharacterController.Grounded) return;
+        if (!headBobEnabled) return;
+
+        if (!playerCharacterController.Grounded || playerCharacterController.Stopping)
+        {
+            transform.localPosition = Vector3.Lerp(transform.localPosition, _startPosition, Time.deltaTime);
+            return;
+        }
 
         if (playerCharacterController.Movement.magnitude > 0)
         {
             var speed = Mathf.Clamp01(playerCharacterController.Movement.magnitude / playerCharacterController.MaxSpeed);
             transform.localPosition = _startPosition + GetHeadBobPosition(speed);
-
-            var targetPosition = playerCharacterController.transform.position;
-            targetPosition.y += transform.localPosition.y;
-            targetPosition += transform.forward * 2;
-
-            transform.LookAt(targetPosition);
-        }
-
-        if (playerCharacterController.Stopping)
-        {
-            transform.localPosition = Vector3.Lerp(transform.localPosition, _startPosition, Time.deltaTime);
         }
     }
 

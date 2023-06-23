@@ -1,4 +1,3 @@
-using Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -23,48 +22,57 @@ public class PlayerCharacterController : MonoBehaviour
     [SerializeField] private float airBrake; // 0-1 (0 = no brake, 1 = full brake)
     [Tooltip("The layer mask for the ground")]
     [SerializeField] private LayerMask groundLayerMask;
-    
+
     private Rigidbody _rigidbody;
-    private bool _grounded;
 
     public Vector2 Direction { get; set; }
     public bool Jumping { get; set; }
 
     // Events
     public event UnityAction OnJump;
-    public event UnityAction<float> OnLand;
-    
+    public event UnityAction<float> OnLand; // the float is the magnitude of the impact
+
     // Properties
     public Vector3 Movement => _rigidbody.velocity;
-    public bool Grounded => _grounded;
+    public bool Grounded { get; private set; }
     public float MaxSpeed => maxSpeed;
     public bool Stopping => Direction == Vector2.zero;
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+    }
+
+    private void Start()
+    {
         OnJump += Jump;
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (groundLayerMask == (groundLayerMask | (1 << other.gameObject.layer)))
+        {
+            Grounded = true;
+            OnLand?.Invoke(other.impulse.magnitude);
+        }
     }
 
     private void OnCollisionStay(Collision other)
     {
-        if (groundLayerMask != (groundLayerMask | (1 << other.gameObject.layer))) return;
-        
-        _grounded = true;
-        OnLand?.Invoke(other.impulse.magnitude);
+        if (groundLayerMask == (groundLayerMask | (1 << other.gameObject.layer)))
+        {
+            Grounded = true;
+        }
     }
 
     private void OnCollisionExit(Collision other)
     {
-        if (groundLayerMask == (groundLayerMask | (1 << other.gameObject.layer)))
-        {
-            _grounded = false;
-        }
+        Grounded = false;
     }
 
     private void Update()
     {
-        if (Jumping && _grounded)
+        if (Jumping && Grounded)
         {
             OnJump?.Invoke();
         }
@@ -85,7 +93,7 @@ public class PlayerCharacterController : MonoBehaviour
         {
             var movementForce = playerDirection * acceleration;
 
-            if (_grounded)
+            if (Grounded)
             {
                 if (horizontalVelocity.magnitude <= maxSpeed)
                 {
@@ -106,7 +114,7 @@ public class PlayerCharacterController : MonoBehaviour
         {
             var breakingForce = -horizontalVelocity * deceleration;
 
-            if (!_grounded)
+            if (!Grounded)
             {
                 breakingForce *= airBrake;
             }

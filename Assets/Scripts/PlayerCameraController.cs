@@ -36,12 +36,13 @@ public class PlayerCameraController : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         _xRotation -= Look.y * sensitivity;
         _xRotation = Mathf.Clamp(_xRotation, minimumAngle, maximumAngle);
 
-        transform.localRotation = Quaternion.Euler(_xRotation, 0, 0);
+        transform.localRotation = Quaternion.Euler(_xRotation, transform.localRotation.eulerAngles.y, transform.localRotation.eulerAngles.z);
+
         playerCharacterController.transform.Rotate(Look.x * sensitivity * Vector3.up);
     }
 }
