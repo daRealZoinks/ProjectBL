@@ -1,27 +1,23 @@
-using UnityEngine;
-using Unity.Netcode;
 using Cinemachine;
+using Unity.Netcode;
+using UnityEngine;
 
-public class NetworkPlayerManager : NetworkBehaviour
+namespace Networking
 {
-    [SerializeField] private CinemachineVirtualCamera virtualCamera;
-
-    [SerializeField] private Behaviour[] componentsToDisable;
-    [SerializeField] private GameObject[] objectsToDestroy;
-
-    public override void OnNetworkSpawn()
+    public class NetworkPlayerManager : NetworkBehaviour
     {
-        if (!IsOwner)
-        {
-            foreach (var component in componentsToDisable)
-            {
-                Destroy(component);
-            }
+        [SerializeField] private CinemachineVirtualCamera virtualCamera;
 
-            foreach (var obj in objectsToDestroy)
-            {
-                Destroy(obj);
-            }
+        [SerializeField] private Behaviour[] componentsToDisable;
+        [SerializeField] private GameObject[] objectsToDestroy;
+
+        public override void OnNetworkSpawn()
+        {
+            if (IsOwner) return;
+
+            foreach (var component in componentsToDisable) component.enabled = false;
+
+            foreach (var obj in objectsToDestroy) Destroy(obj);
 
             virtualCamera.Priority = 5;
         }
