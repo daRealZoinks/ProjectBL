@@ -14585,7 +14585,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2094439040}
   m_Layer: 0
-  m_Name: --- DONT TOUCH ---
+  m_Name: --- INVISIBLE ---
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14616,7 +14616,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2106199005}
   m_Layer: 0
-  m_Name: --- TOUCH ---
+  m_Name: --- VISIBLE ---
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
