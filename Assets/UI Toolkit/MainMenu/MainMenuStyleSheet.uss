@@ -23,3 +23,16 @@
     transition-duration: 0.1s;
     transition-timing-function: ease-in-out;
 }
+
+.button:active {
+    -unity-font-definition: url('project://database/Assets/UI%20Toolkit/MainMenu/Belanosima-Regular%20SDF.asset?fileID=11400000&guid=d4e551b7bea0aba4e84f1b8346eaf940&type=2#Belanosima-Regular SDF');
+    -unity-font: url('project://database/Assets/TextMesh%20Pro/Fonts/Belanosima-Regular.ttf?fileID=12800000&guid=58dba5bf60fe7b44d9e621c1efe444d5&type=3#Belanosima-Regular');
+    color: rgb(0, 0, 0);
+    background-color: rgba(255, 255, 255, 0.32);
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    transition-duration: 0.1s;
+    transition-timing-function: ease-in-out;
+}
