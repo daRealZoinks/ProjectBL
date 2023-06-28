@@ -42,11 +42,14 @@ public class TeamPod : MonoBehaviour
             networkObjects.Add(playerCollider.GetComponent<NetworkObject>());
         }
 
-        foreach (var networkObject in networkObjects)
+        if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost)
         {
-            if (networkObject.IsOwnedByServer)
+            foreach (var networkObject in networkObjects)
             {
-                NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+                if (networkObject.IsOwnedByServer)
+                {
+                    NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+                }
             }
         }
     }

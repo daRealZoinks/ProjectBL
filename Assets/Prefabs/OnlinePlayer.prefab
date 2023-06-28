@@ -88,11 +88,11 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7794279956762562397, guid: 378e8fe066a20484aa32330c4173d577,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6636847748737658706}
+      addedObject: {fileID: 169}
     - targetCorrespondingSourceObject: {fileID: 7794279956762562397, guid: 378e8fe066a20484aa32330c4173d577,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 169}
+      addedObject: {fileID: 3013053795802205953}
     - targetCorrespondingSourceObject: {fileID: 8311973363586975943, guid: 378e8fe066a20484aa32330c4173d577,
         type: 3}
       insertIndex: -1
@@ -185,7 +185,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7536299176113935708}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 61772c55b2bd5be4ca62b051ced4f0d1, type: 3}
   m_Name: 
@@ -208,18 +208,6 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &6636847748737658706
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7536299176113935708}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,6 +228,18 @@ MonoBehaviour:
   - {fileID: 5333377779202968031}
   objectsToDestroy:
   - {fileID: 4902670729765011598}
+--- !u!114 &3013053795802205953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7536299176113935708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc9e7f94f915974468b11b038e2f0783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8384175551827798233 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8135219768289751768, guid: 378e8fe066a20484aa32330c4173d577,
