@@ -6,7 +6,10 @@ namespace LocalPlayer
     {
         [SerializeField] private bool headBobEnabled = true;
 
-        [Header("Bobbing")] [Tooltip("The amount of bobbing when the player is moving")] [SerializeField] [Range(0, 0.1f)]
+        [Header("Bobbing")]
+        [Tooltip("The amount of bobbing when the player is moving")]
+        [SerializeField]
+        [Range(0, 0.1f)]
         private float amplitude = 0.08f;
 
         [Tooltip("The speed of the bobbing when the player is moving")] [SerializeField] [Range(0, 30f)]

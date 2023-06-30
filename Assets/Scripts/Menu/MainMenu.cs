@@ -8,26 +8,15 @@ namespace Menu
     public class MainMenu : MonoBehaviour
     {
         [SerializeField] private string sceneName;
-
-#if UNITY_EDITOR
-        [SerializeField] private SceneAsset sceneAsset;
-        private void OnValidate()
-        {
-            if (sceneAsset != null)
-            {
-                sceneName = sceneAsset.name;
-            }
-        }
-#endif
-
-        private VisualElement _mainMenu;
-        private Button _playButton;
-        private Button _optionsButton;
-        private Button _quitButton;
+        private Button _backButton;
         private Label _loadingLabel;
 
+        private VisualElement _mainMenu;
+        private Button _optionsButton;
+
         private VisualElement _optionsMenu;
-        private Button _backButton;
+        private Button _playButton;
+        private Button _quitButton;
 
         private void Awake()
         {
@@ -69,5 +58,13 @@ namespace Menu
             _mainMenu.style.display = DisplayStyle.Flex;
             _optionsMenu.style.display = DisplayStyle.None;
         }
+
+#if UNITY_EDITOR
+        [SerializeField] private SceneAsset sceneAsset;
+        private void OnValidate()
+        {
+            if (sceneAsset != null) sceneName = sceneAsset.name;
+        }
+#endif
     }
 }

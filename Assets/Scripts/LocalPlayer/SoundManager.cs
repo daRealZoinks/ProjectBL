@@ -17,11 +17,14 @@ namespace LocalPlayer
         {
             if (_playerCharacterController.Grounded)
             {
-                var horizontalMovement = new Vector3(_playerCharacterController.Movement.x, 0, _playerCharacterController.Movement.z);
+                var horizontalMovement = new Vector3(_playerCharacterController.Movement.x, 0,
+                    _playerCharacterController.Movement.z);
                 _audioSource.mute = !(horizontalMovement.magnitude > 0.1f);
             }
             else
+            {
                 _audioSource.mute = true;
+            }
         }
     }
 }

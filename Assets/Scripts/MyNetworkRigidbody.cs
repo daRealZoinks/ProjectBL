@@ -1,9 +1,25 @@
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(NetworkTransform))]
 public class MyNetworkRigidbody : NetworkBehaviour
 {
+    [SerializeField] private bool syncronizeVelocity = true;
+    [SerializeField] private bool syncronizeAngularVelocity = true;
+
+    private readonly NetworkVariable<Vector3> _networkAngularVelocity =
+        new(writePerm: NetworkVariableWritePermission.Owner);
+
+    private readonly NetworkVariable<Vector3> _networkPosition = new(writePerm: NetworkVariableWritePermission.Owner);
+
+    private readonly NetworkVariable<Quaternion>
+        _networkRotation = new(writePerm: NetworkVariableWritePermission.Owner);
+
+    private readonly NetworkVariable<Vector3> _networkVelocity = new(writePerm: NetworkVariableWritePermission.Owner);
+
+    private float _angle;
     // Implementing lag compensation for a networked game object with complex movement or rotation can be more challenging than for a simple rigidbody.
     // Here are some general steps you can follow to implement lag compensation for a complex game object:
 
@@ -31,31 +47,12 @@ public class MyNetworkRigidbody : NetworkBehaviour
     // these general steps can help to ensure that the game object's movement or rotation is smooth and consistent across all clients.
 
     private float _distance;
-    private float _angle;
-
-    [SerializeField] private bool syncronizeVelocity = true;
-    [SerializeField] private bool syncronizeAngularVelocity = true;
 
     private Rigidbody _rigidbody;
-
-    private readonly NetworkVariable<Vector3> _networkPosition = new(writePerm: NetworkVariableWritePermission.Owner);
-    private readonly NetworkVariable<Quaternion> _networkRotation = new(writePerm: NetworkVariableWritePermission.Owner);
-
-    private readonly NetworkVariable<Vector3> _networkVelocity = new(writePerm: NetworkVariableWritePermission.Owner);
-    private readonly NetworkVariable<Vector3> _networkAngularVelocity = new(writePerm: NetworkVariableWritePermission.Owner);
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
-    }
-
-    private void FixedUpdate()
-    {
-        if (!IsOwner)
-        {
-            _rigidbody.position = Vector3.MoveTowards(_rigidbody.position, _networkPosition.Value, _distance * (1.0f / NetworkManager.Singleton.NetworkTickSystem.TickRate));
-            _rigidbody.rotation = Quaternion.RotateTowards(_rigidbody.rotation, _networkRotation.Value, _angle * (1.0f / NetworkManager.Singleton.NetworkTickSystem.TickRate));
-        }
     }
 
     private void Update()
@@ -65,15 +62,9 @@ public class MyNetworkRigidbody : NetworkBehaviour
             _networkPosition.Value = _rigidbody.position;
             _networkRotation.Value = _rigidbody.rotation;
 
-            if (syncronizeVelocity)
-            {
-                _networkVelocity.Value = _rigidbody.velocity;
-            }
+            if (syncronizeVelocity) _networkVelocity.Value = _rigidbody.velocity;
 
-            if (syncronizeAngularVelocity)
-            {
-                _networkAngularVelocity.Value = _rigidbody.angularVelocity;
-            }
+            if (syncronizeAngularVelocity) _networkAngularVelocity.Value = _rigidbody.angularVelocity;
         }
         else
         {
@@ -97,6 +88,17 @@ public class MyNetworkRigidbody : NetworkBehaviour
                     _angle = Quaternion.Angle(_rigidbody.rotation, _networkRotation.Value);
                 }
             }
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (!IsOwner)
+        {
+            _rigidbody.position = Vector3.MoveTowards(_rigidbody.position, _networkPosition.Value,
+                _distance * (1.0f / NetworkManager.Singleton.NetworkTickSystem.TickRate));
+            _rigidbody.rotation = Quaternion.RotateTowards(_rigidbody.rotation, _networkRotation.Value,
+                _angle * (1.0f / NetworkManager.Singleton.NetworkTickSystem.TickRate));
         }
     }
 }

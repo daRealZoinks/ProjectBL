@@ -6,15 +6,10 @@ namespace LocalPlayer
     {
         [SerializeField] private bool lateralTiltEnabled = true;
 
-        [Header("Tilt")]
-        [Tooltip("The angle of tilt when the player is moving")]
-        [SerializeField]
-        [Range(0, 10f)]
+        [Header("Tilt")] [Tooltip("The angle of tilt when the player is moving")] [SerializeField] [Range(0, 10f)]
         private float angle = 2f;
 
-        [Tooltip("The speed of the tilt when the player is moving")]
-        [SerializeField]
-        [Range(0, 15f)]
+        [Tooltip("The speed of the tilt when the player is moving")] [SerializeField] [Range(0, 15f)]
         private float speed = 5f;
 
         [SerializeField] private PlayerCharacterController playerCharacterController;

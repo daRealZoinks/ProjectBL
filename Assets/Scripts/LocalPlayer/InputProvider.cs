@@ -8,6 +8,7 @@ namespace LocalPlayer
     public class InputProvider : MonoBehaviour
     {
         [SerializeField] private PlayerCameraController playerCameraController;
+        [SerializeField] private MeleeAttack meleeAttack;
         [SerializeField] private float jumpBufferringTime = 0.5f;
 
         private PlayerCharacterController _playerCharacterController;
@@ -39,6 +40,14 @@ namespace LocalPlayer
                 _playerCharacterController.Jumping = true;
                 await Task.Delay(TimeSpan.FromSeconds(jumpBufferringTime));
                 _playerCharacterController.Jumping = false;
+            }
+        }
+
+        public void OnMelee(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                meleeAttack.Attack();
             }
         }
     }

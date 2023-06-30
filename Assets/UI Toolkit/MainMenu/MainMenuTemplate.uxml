@@ -1,29 +1,38 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenuStyleSheet.uss?fileID=7433441132597879392&amp;guid=f75bbf5d77e92354cb2637ddfac6e864&amp;type=3#MainMenuStyleSheet" />
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenuStyleSheet.uss?fileID=7433441132597879392&amp;guid=f75bbf5d77e92354cb2637ddfac6e864&amp;type=3#MainMenuStyleSheet"/>
     <ui:VisualElement name="main-menu" style="flex-grow: 1; flex-direction: column-reverse; display: flex;">
-        <ui:VisualElement style="align-items: auto; align-self: auto; justify-content: space-around; flex-direction: row;">
-            <ui:VisualElement style="align-items: flex-start; align-self: flex-start; margin-left: 15px; margin-right: 15px; margin-top: 15px; margin-bottom: 15px;">
-                <ui:Button text="PLAY" display-tooltip-when-elided="true" name="play-button" class="button" style="font-size: 70px;" />
+        <ui:VisualElement
+                style="align-items: auto; align-self: auto; justify-content: space-around; flex-direction: row;">
+            <ui:VisualElement
+                    style="align-items: flex-start; align-self: flex-start; margin-left: 15px; margin-right: 15px; margin-top: 15px; margin-bottom: 15px;">
+                <ui:Button text="PLAY" display-tooltip-when-elided="true" name="play-button" class="button"
+                           style="font-size: 70px;"/>
                 <ui:VisualElement style="flex-direction: row; justify-content: flex-start;">
-                    <ui:Button text="OPTIONS" display-tooltip-when-elided="true" name="options-button" class="button" style="font-size: 35px;" />
-                    <ui:Button text="QUIT" display-tooltip-when-elided="true" name="quit-button" class="button" style="font-size: 35px;" />
+                    <ui:Button text="OPTIONS" display-tooltip-when-elided="true" name="options-button" class="button"
+                               style="font-size: 35px;"/>
+                    <ui:Button text="QUIT" display-tooltip-when-elided="true" name="quit-button" class="button"
+                               style="font-size: 35px;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                <ui:Label tabindex="-1" text="LOADING..." display-tooltip-when-elided="true" name="loading-label" style="align-items: flex-end; align-self: flex-end; -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/MainMenu/Belanosima-Regular%20SDF.asset?fileID=11400000&amp;guid=d4e551b7bea0aba4e84f1b8346eaf940&amp;type=2#Belanosima-Regular SDF&apos;); -unity-font: url(&apos;project://database/Assets/TextMesh%20Pro/Fonts/Belanosima-Regular.ttf?fileID=12800000&amp;guid=58dba5bf60fe7b44d9e621c1efe444d5&amp;type=3#Belanosima-Regular&apos;); color: rgb(255, 255, 255); font-size: 59px; margin-left: 18px; margin-right: 18px; margin-top: 18px; margin-bottom: 18px; display: none;" />
+                <ui:Label tabindex="-1" text="LOADING..." display-tooltip-when-elided="true" name="loading-label"
+                          style="align-items: flex-end; align-self: flex-end; -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/MainMenu/Belanosima-Regular%20SDF.asset?fileID=11400000&amp;guid=d4e551b7bea0aba4e84f1b8346eaf940&amp;type=2#Belanosima-Regular SDF&apos;); -unity-font: url(&apos;project://database/Assets/TextMesh%20Pro/Fonts/Belanosima-Regular.ttf?fileID=12800000&amp;guid=58dba5bf60fe7b44d9e621c1efe444d5&amp;type=3#Belanosima-Regular&apos;); color: rgb(255, 255, 255); font-size: 59px; margin-left: 18px; margin-right: 18px; margin-top: 18px; margin-bottom: 18px; display: none;"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="options-menu" style="flex-grow: 1; flex-direction: column-reverse; display: none;">
         <ui:VisualElement style="align-items: flex-start; align-self: flex-start; justify-content: flex-end;">
-            <ui:VisualElement style="align-items: flex-start; align-self: flex-start; margin-left: 15px; margin-right: 15px; margin-top: 15px; margin-bottom: 15px;">
+            <ui:VisualElement
+                    style="align-items: flex-start; align-self: flex-start; margin-left: 15px; margin-right: 15px; margin-top: 15px; margin-bottom: 15px;">
                 <ui:VisualElement style="flex-direction: row; justify-content: flex-start;">
-                    <ui:Button text="BACK" display-tooltip-when-elided="true" name="back-button" class="button" style="font-size: 35px;" />
+                    <ui:Button text="BACK" display-tooltip-when-elided="true" name="back-button" class="button"
+                               style="font-size: 35px;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-            <ui:Label tabindex="-1" text="OPTIONS" display-tooltip-when-elided="true" style="font-size: 80px; color: rgb(255, 255, 255); -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/MainMenu/Belanosima-Regular%20SDF.asset?fileID=11400000&amp;guid=d4e551b7bea0aba4e84f1b8346eaf940&amp;type=2#Belanosima-Regular SDF&apos;); -unity-font: url(&apos;project://database/Assets/TextMesh%20Pro/Fonts/Belanosima-Regular.ttf?fileID=12800000&amp;guid=58dba5bf60fe7b44d9e621c1efe444d5&amp;type=3#Belanosima-Regular&apos;); margin-left: 27px; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+            <ui:Label tabindex="-1" text="OPTIONS" display-tooltip-when-elided="true"
+                      style="font-size: 80px; color: rgb(255, 255, 255); -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/MainMenu/Belanosima-Regular%20SDF.asset?fileID=11400000&amp;guid=d4e551b7bea0aba4e84f1b8346eaf940&amp;type=2#Belanosima-Regular SDF&apos;); -unity-font: url(&apos;project://database/Assets/TextMesh%20Pro/Fonts/Belanosima-Regular.ttf?fileID=12800000&amp;guid=58dba5bf60fe7b44d9e621c1efe444d5&amp;type=3#Belanosima-Regular&apos;); margin-left: 27px; margin-right: 0; margin-top: 0; margin-bottom: 0;"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
