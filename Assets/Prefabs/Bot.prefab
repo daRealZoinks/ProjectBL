@@ -8,10 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5571163948937526567, guid: 378e8fe066a20484aa32330c4173d577,
+    - target: {fileID: 5467027810233215775, guid: 378e8fe066a20484aa32330c4173d577,
         type: 3}
-      propertyPath: lockCursor
-      value: 0
+      propertyPath: m_Priority
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7794279956762562393, guid: 378e8fe066a20484aa32330c4173d577,
         type: 3}
@@ -96,6 +96,30 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1189642668055273295}
   m_SourcePrefab: {fileID: 100100000, guid: 378e8fe066a20484aa32330c4173d577, type: 3}
+--- !u!114 &1152708955060459205 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 142767125561270786, guid: 378e8fe066a20484aa32330c4173d577,
+    type: 3}
+  m_PrefabInstance: {fileID: 1009944716124665031}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2357d895fc44ffd41afd47aff1b7b184, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4851726201947326944 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5571163948937526567, guid: 378e8fe066a20484aa32330c4173d577,
+    type: 3}
+  m_PrefabInstance: {fileID: 1009944716124665031}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cd4974b06d84fad95a201173c84216b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7074824119205968794 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7794279956762562397, guid: 378e8fe066a20484aa32330c4173d577,
@@ -145,3 +169,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a04ac2ef2601cd740b86292667eab2b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerCameraController: {fileID: 4851726201947326944}
+  meleeAttack: {fileID: 1152708955060459205}

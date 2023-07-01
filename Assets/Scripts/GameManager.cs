@@ -5,9 +5,10 @@ using UnityEngine;
 public class GameManager : NetworkBehaviour
 {
     [SerializeField] private NetworkObject ballPrefab;
+    [SerializeField] private NetworkObject ballInstance;
     [SerializeField] private Transform ballSpawnPoint;
 
-    [SerializeField] private ArtificialIntelligence artificialIntelligencePrefab;
+    [SerializeField] private NetworkObject artificialIntelligencePrefab;
     [SerializeField] private int numberOfArtificialIntelligences = 1;
     [SerializeField] private List<Transform> artificialIntelligenceSpawnPoints;
 
@@ -43,14 +44,19 @@ public class GameManager : NetworkBehaviour
     {
         if (IsServer)
         {
-            Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity).Spawn();
+            ballInstance = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity);
+
+            ballInstance.Spawn();
 
             for (var i = 0; i < numberOfArtificialIntelligences; i++)
             {
-                var artificialIntelligence = Instantiate(artificialIntelligencePrefab, artificialIntelligenceSpawnPoints[i].position, Quaternion.identity);
-                artificialIntelligence.GetComponent<NetworkObject>().Spawn();
+                var artificialIntelligenceInstance = Instantiate(artificialIntelligencePrefab, artificialIntelligenceSpawnPoints[i].position, artificialIntelligenceSpawnPoints[i].rotation);
 
-                artificialIntelligence.Ball = ballPrefab.gameObject;
+                artificialIntelligenceInstance.Spawn();
+
+                var artificialIntelligence = artificialIntelligenceInstance.GetComponent<ArtificialIntelligence>();
+
+                artificialIntelligence.Target = ballInstance.transform;
 
                 _artificialIntelligences.Add(artificialIntelligence);
             }

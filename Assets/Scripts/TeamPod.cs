@@ -10,7 +10,7 @@ public class TeamPod : MonoBehaviour
 
     private void Update()
     {
-        var offset = (Vector3.right + Vector3.forward) * 2.5f + 3 * Vector3.up;
+        var offset = (transform.right + transform.forward) * 2.5f + 3 * transform.up;
 
         var colliders = Physics.OverlapBox(transform.position + offset, 2.5f * Vector3.one, Quaternion.identity);
 
