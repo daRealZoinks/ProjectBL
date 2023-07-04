@@ -6,11 +6,17 @@ public class NetworkButtons : MonoBehaviour
     private void OnGUI()
     {
         GUILayout.BeginArea(new Rect(10, 10, 300, 300));
-        if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
+
+        var networkManager = NetworkManager.Singleton;
+        if (!networkManager.IsClient && !networkManager.IsServer)
         {
-            if (GUILayout.Button("Host")) NetworkManager.Singleton.StartHost();
-            if (GUILayout.Button("Server")) NetworkManager.Singleton.StartServer();
-            if (GUILayout.Button("Client")) NetworkManager.Singleton.StartClient();
+            if (GUILayout.Button("Host")) networkManager.StartHost();
+            if (GUILayout.Button("Client")) networkManager.StartClient();
+            if (GUILayout.Button("Server")) networkManager.StartServer();
+        }
+        else
+        {
+            GUILayout.Label($"Mode: {(networkManager.IsHost ? "Host" : networkManager.IsServer ? "Server" : "Client")}");
         }
 
         GUILayout.EndArea();

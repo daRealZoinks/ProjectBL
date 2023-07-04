@@ -8,7 +8,7 @@ namespace LocalPlayer
         private bool lockCursor = true;
 
         [Header("Camera")] [Tooltip("The sensitivity of the camera")] [SerializeField]
-        private float sensitivity = 1f;
+        private float sensitivity = 0.1f;
 
         [Tooltip("The virtual camera")] [SerializeField]
         private PlayerCharacterController playerCharacterController;
@@ -39,7 +39,7 @@ namespace LocalPlayer
 
         private void Update()
         {
-            _xRotation -= Look.y * sensitivity * Time.deltaTime;
+            _xRotation -= Look.y * sensitivity;
             _xRotation = Mathf.Clamp(_xRotation, minimumAngle, maximumAngle);
 
             var localRotation = transform.localRotation;
@@ -47,7 +47,7 @@ namespace LocalPlayer
             localRotation = Quaternion.Euler(_xRotation, localRotation.eulerAngles.y, localRotation.eulerAngles.z);
             transform.localRotation = localRotation;
 
-            playerCharacterController.transform.Rotate(Look.x * sensitivity * Vector3.up * Time.deltaTime);
+            playerCharacterController.transform.Rotate(Look.x * sensitivity * Vector3.up);
         }
     }
 }
