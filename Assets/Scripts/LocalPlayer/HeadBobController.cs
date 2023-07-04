@@ -12,10 +12,13 @@ namespace LocalPlayer
         [Range(0, 0.1f)]
         private float amplitude = 0.08f;
 
-        [Tooltip("The speed of the bobbing when the player is moving")] [SerializeField] [Range(0, 30f)]
+        [Tooltip("The speed of the bobbing when the player is moving")]
+        [SerializeField]
+        [Range(0, 30f)]
         private float frequency = 18.5f;
 
         [SerializeField] private PlayerCharacterController playerCharacterController;
+        [SerializeField] private PlayerWallRunController playerWallRunController;
 
         private Vector3 _startPosition;
         private Vector3 _targetLookAtPosition;
@@ -35,13 +38,13 @@ namespace LocalPlayer
         {
             if (!headBobEnabled) return;
 
-            if (!playerCharacterController.Grounded || playerCharacterController.Stopping)
+            if ((!playerCharacterController.IsGrounded || playerCharacterController.Stopping) && !playerWallRunController.IsWallRunning)
             {
                 transform.localPosition = Vector3.Lerp(transform.localPosition, _startPosition, Time.deltaTime);
                 return;
             }
 
-            if (playerCharacterController.Movement.magnitude > 0)
+            if (playerCharacterController.Movement.magnitude > 0 || playerWallRunController.IsWallRunning)
             {
                 var speed = Mathf.Clamp01(playerCharacterController.Movement.magnitude /
                                           playerCharacterController.MaxSpeed);

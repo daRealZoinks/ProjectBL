@@ -231,6 +231,7 @@ GameObject:
   - component: {fileID: 5753339366875455905}
   - component: {fileID: -3148139872234078989}
   - component: {fileID: -4509371769481015721}
+  - component: {fileID: 2121126165229120460}
   - component: {fileID: 8135219768289751768}
   - component: {fileID: 5057796971305018253}
   - component: {fileID: 7697992282487682157}
@@ -420,6 +421,22 @@ MonoBehaviour:
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 64
+--- !u!114 &2121126165229120460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7794279956762562397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 706b672f4be255a499575d4cee718dc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallJumpHeight: 3
+  wallJumpSideForce: 8
+  wallJumpForwardForce: 8
+  wallCheckDistance: 0.56
 --- !u!114 &8135219768289751768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -670,6 +687,7 @@ MonoBehaviour:
   amplitude: 0.08
   frequency: 18.5
   playerCharacterController: {fileID: -4509371769481015721}
+  playerWallRunController: {fileID: 2121126165229120460}
 --- !u!114 &5968340664252194431
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -684,8 +702,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lateralTiltEnabled: 1
   angle: 2
+  wallrunAngle: 5
   speed: 5
   playerCharacterController: {fileID: -4509371769481015721}
+  playerWallRunController: {fileID: 2121126165229120460}
 --- !u!114 &142767125561270786
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -519,7 +519,7 @@ GameObject:
   - component: {fileID: 569154806}
   - component: {fileID: 569154805}
   - component: {fileID: 569154804}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wall (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -931,7 +931,7 @@ GameObject:
   - component: {fileID: 776699429}
   - component: {fileID: 776699428}
   - component: {fileID: 776699427}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2134,7 +2134,7 @@ GameObject:
   - component: {fileID: 1100117549}
   - component: {fileID: 1100117548}
   - component: {fileID: 1100117554}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BlueGoal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2586,7 +2586,7 @@ GameObject:
   - component: {fileID: 1185670318}
   - component: {fileID: 1185670317}
   - component: {fileID: 1185670323}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: OrangeGoal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2950,7 +2950,7 @@ GameObject:
   - component: {fileID: 1254869942}
   - component: {fileID: 1254869941}
   - component: {fileID: 1254869940}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wall (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3302,7 +3302,7 @@ GameObject:
   - component: {fileID: 1267144819}
   - component: {fileID: 1267144818}
   - component: {fileID: 1267144817}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wall (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

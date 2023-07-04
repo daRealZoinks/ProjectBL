@@ -8,37 +8,55 @@ namespace LocalPlayer
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerCharacterController : MonoBehaviour
     {
-        [Header("Movement")] [Tooltip("The acceleration of the player in m/s^2")] [SerializeField]
+        [Header("Movement")]
+        [Tooltip("The acceleration of the player in m/s^2")]
+        [SerializeField]
         private float acceleration = 4096f; // m/s^2
 
-        [Tooltip("The deceleration of the player in m/s^2")] [SerializeField]
+        [Tooltip("The deceleration of the player in m/s^2")]
+        [SerializeField]
         private float deceleration = 700f; // m/s^2
 
-        [Tooltip("The maximum speed of the player in m/s")] [SerializeField]
+        [Tooltip("The maximum speed of the player in m/s")]
+        [SerializeField]
         private float maxSpeed = 13f; // m/s
 
-        [Space] [Header("Jump")] [Tooltip("The height of the player's jump in m")] [SerializeField]
+        [Space]
+        [Header("Jump")]
+        [Tooltip("The height of the player's jump in m")]
+        [SerializeField]
         private float jumpHeight = 3f; // m
 
-        [Tooltip("The amount of control the player has in the air")] [SerializeField] [Range(0, 1f)]
+        [Tooltip("The amount of control the player has in the air")]
+        [SerializeField]
+        [Range(0, 1f)]
         private float airControl = 0.1f; // 0-1 (0 = no control, 1 = full control)
 
-        [Tooltip("The amount of air braking the player has")] [SerializeField] [Range(0, 1f)]
+        [Tooltip("The amount of air braking the player has")]
+        [SerializeField]
+        [Range(0, 1f)]
         private float airBrake; // 0-1 (0 = no brake, 1 = full brake)
 
-        [Space] [Header("Grounding")] [Tooltip("The height of the player's capsule in m")] [SerializeField]
+        [Space]
+        [Header("Grounding")]
+        [Tooltip("The height of the player's capsule in m")]
+        [SerializeField]
         private float rideHeight = 1f; // m
 
-        [Tooltip("The length of the raycast used to detect the ground in m")] [SerializeField]
+        [Tooltip("The length of the raycast used to detect the ground in m")]
+        [SerializeField]
         private float rayLength = 1.5f; // m
 
-        [Tooltip("The strength of the spring used to keep the player grounded in N/m")] [SerializeField]
+        [Tooltip("The strength of the spring used to keep the player grounded in N/m")]
+        [SerializeField]
         private float rideSpringStrength = 100f; // N/m
 
-        [Tooltip("The damper of the spring used to keep the player grounded in N/(m/s)")] [SerializeField]
+        [Tooltip("The damper of the spring used to keep the player grounded in N/(m/s)")]
+        [SerializeField]
         private float rideSpringDamper = 10f; // N/(m/s)
 
-        [Tooltip("The layer mask used to detect the ground")] [SerializeField]
+        [Tooltip("The layer mask used to detect the ground")]
+        [SerializeField]
         private LayerMask groundLayerMask;
 
         private Vector2 _direction;
@@ -54,9 +72,10 @@ namespace LocalPlayer
         }
 
         public bool Jumping { get; set; }
-        public bool Grounded { get; private set; }
+        public bool MovementEnabled { get; set; } = true;
+        public bool IsGrounded { get; private set; }
+        public LayerMask GroundLayerMask => groundLayerMask;
 
-        // Properties
         public Vector3 Movement => _rigidbody.velocity;
         public float MaxSpeed => maxSpeed;
         public bool Stopping => Direction == Vector2.zero;
@@ -73,12 +92,15 @@ namespace LocalPlayer
 
         private void Update()
         {
-            if (Jumping && Grounded) OnJump?.Invoke();
+            if (Jumping && IsGrounded) OnJump?.Invoke();
         }
 
         private void FixedUpdate()
         {
-            MovementLogic();
+            if (MovementEnabled)
+            {
+                MovementLogic();
+            }
             Floating();
         }
 
@@ -91,24 +113,25 @@ namespace LocalPlayer
             var playerDirection = Direction.x * playerTransform.right + Direction.y * playerTransform.forward;
             playerDirection.Normalize();
 
-            var finalForce = Vector3.zero;
+            Vector3 finalForce;
 
             if (playerDirection != Vector3.zero)
             {
-                var movementForce = playerDirection * acceleration * (Grounded ? 1 : airControl);
+                finalForce = playerDirection;
 
-                if (horizontalVelocity.magnitude <= maxSpeed)
-                    finalForce += movementForce;
-                else
-                    finalForce += (playerDirection - horizontalVelocity.normalized) * acceleration;
+                if (horizontalVelocity.magnitude > maxSpeed)
+                {
+                    finalForce -= horizontalVelocity.normalized;
+                }
+
+                finalForce *= acceleration;
+                finalForce *= (IsGrounded ? 1 : airControl);
             }
             else
             {
-                var breakingForce = -horizontalVelocity * deceleration;
+                finalForce = -horizontalVelocity * deceleration;
 
-                if (!Grounded) breakingForce *= airBrake;
-
-                finalForce += breakingForce;
+                finalForce *= (IsGrounded ? 1 : airBrake);
             }
 
             _rigidbody.AddForce(finalForce * Time.fixedDeltaTime, ForceMode.Acceleration);
@@ -119,12 +142,12 @@ namespace LocalPlayer
             var ray = new Ray(transform.position, Vector3.down);
             var rayDidHit = Physics.Raycast(ray, out var hitInfo, rayLength, groundLayerMask);
 
-            var wasGrounded = Grounded;
-            Grounded = rayDidHit && hitInfo.distance <= rideHeight;
+            var wasGrounded = IsGrounded;
+            IsGrounded = rayDidHit && hitInfo.distance <= rideHeight;
 
             if (!_floatingEnabled) return;
 
-            if (Grounded && !wasGrounded) OnLand?.Invoke(_rigidbody.velocity.y);
+            if (IsGrounded && !wasGrounded) OnLand?.Invoke(_rigidbody.velocity.y);
 
             if (rayDidHit)
             {
@@ -154,12 +177,12 @@ namespace LocalPlayer
 
         private async void Jump()
         {
-            var jumpForce = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
+            var jumpForce = Vector3.up * Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
 
             _floatingEnabled = false;
 
             _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, 0f, _rigidbody.velocity.z);
-            _rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
+            _rigidbody.AddForce(jumpForce, ForceMode.VelocityChange);
             Jumping = false;
             await Task.Delay(TimeSpan.FromSeconds(0.4f));
             _floatingEnabled = true;
