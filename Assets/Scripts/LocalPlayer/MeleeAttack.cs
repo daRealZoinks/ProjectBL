@@ -10,14 +10,11 @@ public class MeleeAttack : MonoBehaviour
 
     public void Attack()
     {
-        var hits = Physics.OverlapCapsule(transform.position, transform.position + transform.forward * _attackRange, _attackRadius);
+        var hits = Physics.OverlapCapsule(transform.position, transform.position + transform.forward * _attackRange,
+            _attackRadius);
 
         foreach (var hit in hits)
-        {
             if (hit.TryGetComponent<Rigidbody>(out var rigidbody))
-            {
                 rigidbody.AddForce(transform.forward * _attackForce, ForceMode.Impulse);
-            }
-        }
     }
 }

@@ -1,14 +1,46 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class OptionsMenu : MonoBehaviour
 {
-    // Start is called before the first frame update
-    private void Start()
-    {
-    }
+    private Button _backButton;
+    private VisualElement _graphicsMenu;
+    private Button _graphicsMenuButton;
+    private VisualElement _mainMenu;
+    private VisualElement _optionsMenu;
+    private VisualElement _root;
+    private VisualElement _soundMenu;
 
-    // Update is called once per frame
-    private void Update()
+    private Button _soundMenuButton;
+
+    private void Awake()
     {
+        _root = GetComponent<UIDocument>().rootVisualElement;
+
+        _mainMenu = _root.Q<VisualElement>("main-menu");
+        _optionsMenu = _root.Q<VisualElement>("options-menu");
+        _soundMenu = _root.Q<VisualElement>("sound-menu");
+        _graphicsMenu = _root.Q<VisualElement>("graphics-menu");
+
+        _backButton = _root.Q<Button>("options-menu-back-button");
+        _backButton.clicked += () =>
+        {
+            _mainMenu.style.display = DisplayStyle.Flex;
+            _optionsMenu.style.display = DisplayStyle.None;
+        };
+
+        _soundMenuButton = _root.Q<Button>("sound-menu-button");
+        _soundMenuButton.clicked += () =>
+        {
+            _optionsMenu.style.display = DisplayStyle.None;
+            _soundMenu.style.display = DisplayStyle.Flex;
+        };
+
+        _graphicsMenuButton = _root.Q<Button>("graphics-menu-button");
+        _graphicsMenuButton.clicked += () =>
+        {
+            _optionsMenu.style.display = DisplayStyle.None;
+            _graphicsMenu.style.display = DisplayStyle.Flex;
+        };
     }
 }

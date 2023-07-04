@@ -8,7 +8,6 @@ namespace Menu
     public class MainMenu : MonoBehaviour
     {
         [SerializeField] private string sceneName;
-        private Button _backButton;
         private Label _loadingLabel;
 
         private VisualElement _mainMenu;
@@ -32,13 +31,9 @@ namespace Menu
 
             _optionsMenu = root.Q<VisualElement>("options-menu");
 
-            _backButton = root.Q<Button>("back-button");
-
             _playButton.clicked += PlayGame;
             _optionsButton.clicked += Options;
             _quitButton.clicked += Application.Quit;
-
-            _backButton.clicked += Back;
         }
 
         private void PlayGame()
@@ -51,12 +46,6 @@ namespace Menu
         {
             _mainMenu.style.display = DisplayStyle.None;
             _optionsMenu.style.display = DisplayStyle.Flex;
-        }
-
-        private void Back()
-        {
-            _mainMenu.style.display = DisplayStyle.Flex;
-            _optionsMenu.style.display = DisplayStyle.None;
         }
 
 #if UNITY_EDITOR

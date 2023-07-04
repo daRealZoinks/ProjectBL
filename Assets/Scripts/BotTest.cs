@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class BotTest : MonoBehaviour
@@ -33,10 +32,7 @@ public class BotTest : MonoBehaviour
         {
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(ray, out var hit))
-            {
-                return hit.point;
-            }
+            if (Physics.Raycast(ray, out var hit)) return hit.point;
         }
 
         return null;

@@ -10,13 +10,13 @@ public class AdvancedNetworkRigidbody : NetworkBehaviour
 {
     [SerializeField] private bool serverAuthoritativePosition = true;
     [SerializeField] private bool serverAuthoritativeRotation = true;
-    [SerializeField] private bool serverAuthoritativeVelocity = false;
-    [SerializeField] private bool serverAuthoritativeAngularVelocity = false;
+    [SerializeField] private bool serverAuthoritativeVelocity;
+    [SerializeField] private bool serverAuthoritativeAngularVelocity;
+    private NetworkVariable<Vector3> _networkAngularVelocity;
 
     private NetworkVariable<Vector3> _networkPosition;
     private NetworkVariable<Quaternion> _networkRotation;
     private NetworkVariable<Vector3> _networkVelocity;
-    private NetworkVariable<Vector3> _networkAngularVelocity;
 
     private Rigidbody _rigidbody;
 
@@ -24,36 +24,18 @@ public class AdvancedNetworkRigidbody : NetworkBehaviour
     {
         _rigidbody = GetComponent<Rigidbody>();
 
-        _networkPosition = new(writePerm: serverAuthoritativePosition ? NetworkVariableWritePermission.Server : NetworkVariableWritePermission.Owner);
-        _networkRotation = new(writePerm: serverAuthoritativeRotation ? NetworkVariableWritePermission.Server : NetworkVariableWritePermission.Owner);
-        _networkVelocity = new(writePerm: serverAuthoritativeVelocity ? NetworkVariableWritePermission.Server : NetworkVariableWritePermission.Owner);
-        _networkAngularVelocity = new(writePerm: serverAuthoritativeAngularVelocity ? NetworkVariableWritePermission.Server : NetworkVariableWritePermission.Owner);
-    }
-
-    private void SyncNetworkVariable<T>(NetworkVariable<T> networkVariable, T value)
-    {
-        if (networkVariable.WritePerm == NetworkVariableWritePermission.Server)
-        {
-            if (IsServer)
-            {
-                networkVariable.Value = value;
-            }
-            else
-            {
-                value = networkVariable.Value;
-            }
-        }
-        else
-        {
-            if (IsOwner)
-            {
-                networkVariable.Value = value;
-            }
-            else
-            {
-                value = networkVariable.Value;
-            }
-        }
+        _networkPosition = new NetworkVariable<Vector3>(writePerm: serverAuthoritativePosition
+            ? NetworkVariableWritePermission.Server
+            : NetworkVariableWritePermission.Owner);
+        _networkRotation = new NetworkVariable<Quaternion>(writePerm: serverAuthoritativeRotation
+            ? NetworkVariableWritePermission.Server
+            : NetworkVariableWritePermission.Owner);
+        _networkVelocity = new NetworkVariable<Vector3>(writePerm: serverAuthoritativeVelocity
+            ? NetworkVariableWritePermission.Server
+            : NetworkVariableWritePermission.Owner);
+        _networkAngularVelocity = new NetworkVariable<Vector3>(writePerm: serverAuthoritativeAngularVelocity
+            ? NetworkVariableWritePermission.Server
+            : NetworkVariableWritePermission.Owner);
     }
 
     // private void FixedUpdate()
@@ -157,5 +139,23 @@ public class AdvancedNetworkRigidbody : NetworkBehaviour
         // SyncNetworkVariable(_networkRotation, _rigidbody.rotation);
         SyncNetworkVariable(_networkVelocity, _rigidbody.velocity);
         SyncNetworkVariable(_networkAngularVelocity, _rigidbody.angularVelocity);
+    }
+
+    private void SyncNetworkVariable<T>(NetworkVariable<T> networkVariable, T value)
+    {
+        if (networkVariable.WritePerm == NetworkVariableWritePermission.Server)
+        {
+            if (IsServer)
+                networkVariable.Value = value;
+            else
+                value = networkVariable.Value;
+        }
+        else
+        {
+            if (IsOwner)
+                networkVariable.Value = value;
+            else
+                value = networkVariable.Value;
+        }
     }
 }

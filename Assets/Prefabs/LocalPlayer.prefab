@@ -636,7 +636,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockCursor: 1
-  sensitivity: 0.1
+  sensitivity: 3
   playerCharacterController: {fileID: -4509371769481015721}
   minimumAngle: -90
   maximumAngle: 90

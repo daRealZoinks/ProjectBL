@@ -45,10 +45,7 @@ namespace LocalPlayer
 
         public void OnMelee(InputValue value)
         {
-            if (value.isPressed)
-            {
-                meleeAttack.Attack();
-            }
+            if (value.isPressed) meleeAttack.Attack();
         }
     }
 }

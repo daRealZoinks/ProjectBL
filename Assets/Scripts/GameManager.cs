@@ -18,7 +18,7 @@ public class GameManager : NetworkBehaviour
     private readonly NetworkVariable<int> blueScore = new(writePerm: NetworkVariableWritePermission.Server);
     private readonly NetworkVariable<int> orangeScore = new(writePerm: NetworkVariableWritePermission.Server);
 
-    private List<ArtificialIntelligence> _artificialIntelligences = new();
+    private readonly List<ArtificialIntelligence> _artificialIntelligences = new();
 
     public int BlueScore
     {
@@ -32,14 +32,6 @@ public class GameManager : NetworkBehaviour
         private set => orangeScore.Value = value;
     }
 
-    private void OnGUI()
-    {
-        GUILayout.BeginArea(new Rect(10, 10, 200, 200));
-        GUILayout.Label($"Blue: {BlueScore}");
-        GUILayout.Label($"Orange: {OrangeScore}");
-        GUILayout.EndArea();
-    }
-
     private void Start()
     {
         if (IsServer)
@@ -50,7 +42,8 @@ public class GameManager : NetworkBehaviour
 
             for (var i = 0; i < numberOfArtificialIntelligences; i++)
             {
-                var artificialIntelligenceInstance = Instantiate(artificialIntelligencePrefab, artificialIntelligenceSpawnPoints[i].position, artificialIntelligenceSpawnPoints[i].rotation);
+                var artificialIntelligenceInstance = Instantiate(artificialIntelligencePrefab,
+                    artificialIntelligenceSpawnPoints[i].position, artificialIntelligenceSpawnPoints[i].rotation);
 
                 artificialIntelligenceInstance.Spawn();
 
@@ -73,6 +66,14 @@ public class GameManager : NetworkBehaviour
     {
         blueGoalPosts.OnGoal -= OnBlueGoal;
         orangeGoalPosts.OnGoal -= OnOrangeGoal;
+    }
+
+    private void OnGUI()
+    {
+        GUILayout.BeginArea(new Rect(10, 10, 200, 200));
+        GUILayout.Label($"Blue: {BlueScore}");
+        GUILayout.Label($"Orange: {OrangeScore}");
+        GUILayout.EndArea();
     }
 
     private void OnBlueGoal()

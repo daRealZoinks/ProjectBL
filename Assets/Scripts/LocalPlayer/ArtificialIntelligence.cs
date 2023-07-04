@@ -1,5 +1,5 @@
-using UnityEngine;
 using LocalPlayer;
+using UnityEngine;
 
 public class ArtificialIntelligence : MonoBehaviour
 {
@@ -7,13 +7,13 @@ public class ArtificialIntelligence : MonoBehaviour
     [SerializeField] private MeleeAttack meleeAttack;
     [SerializeField] private Transform target;
 
+    private PlayerCharacterController _playerCharacterController;
+
     public Transform Target
     {
         get => target;
         set => target = value;
     }
-
-    private PlayerCharacterController _playerCharacterController;
 
     private void Awake()
     {
@@ -34,12 +34,29 @@ public class ArtificialIntelligence : MonoBehaviour
 
         var distanceFromCharacterToTarget = (_playerCharacterController.transform.position - Target.position).magnitude;
 
-        if (distanceFromCharacterToTarget < meleeAttack.AttackRange)
-        {
-            meleeAttack.Attack();
-        }
+        if (distanceFromCharacterToTarget < meleeAttack.AttackRange) meleeAttack.Attack();
 
         playerCameraController.Look = LookAt(Target.position);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (Target == null) return;
+
+        // draw a line from the character to the target
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(playerCameraController.transform.position, Target.position);
+
+        // draw a line for the direction the character is moving
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(transform.position,
+            new Vector3(_playerCharacterController.Direction.x, 0f, _playerCharacterController.Direction.y) +
+            transform.position);
+
+        // draw a line for the direction the character is facing
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(playerCameraController.transform.position,
+            playerCameraController.transform.forward + playerCameraController.transform.position);
     }
 
     private Vector2 MoveTowards(Vector3 target)
@@ -69,22 +86,5 @@ public class ArtificialIntelligence : MonoBehaviour
         var desiredRotation = new Vector2(characterEulerRotation.y, 0f); // TODO: make the bot look up and down
 
         return desiredRotation;
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (Target == null) return;
-
-        // draw a line from the character to the target
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(playerCameraController.transform.position, Target.position);
-
-        // draw a line for the direction the character is moving
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(transform.position, new Vector3(_playerCharacterController.Direction.x, 0f, _playerCharacterController.Direction.y) + transform.position);
-
-        // draw a line for the direction the character is facing
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(playerCameraController.transform.position, playerCameraController.transform.forward + playerCameraController.transform.position);
     }
 }
