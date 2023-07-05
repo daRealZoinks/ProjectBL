@@ -94,6 +94,7 @@ GameObject:
   - component: {fileID: 4577523636189594162}
   - component: {fileID: 7685563256547421706}
   - component: {fileID: 9014337575509084140}
+  - component: {fileID: 8551645547252935201}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Ball
@@ -115,7 +116,7 @@ Transform:
   m_Children:
   - {fileID: 2911326319126738670}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!135 &7685563256547421706
 SphereCollider:
@@ -165,3 +166,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &8551645547252935201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6791358282154724625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5271cdba02bf89843921d0ad987aed8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  predictionTime: 1
+  predictionSteps: 20
