@@ -19,8 +19,9 @@ namespace LocalPlayer
         {
             if (_playerCharacterController.IsGrounded || _playerWallRunController.IsWallRunning)
             {
-                var horizontalMovement = new Vector3(_playerCharacterController.Movement.x, 0,
-                    _playerCharacterController.Movement.z);
+                Vector3 horizontalMovement = new(_playerCharacterController.Velocity.x, 0,
+                    _playerCharacterController.Velocity.z);
+
                 _audioSource.mute = !(horizontalMovement.magnitude > 0.1f);
             }
             else

@@ -1,24 +1,23 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class NetworkButtons : MonoBehaviour
+namespace Networking
 {
-    private void OnGUI()
+    public class NetworkButtons : MonoBehaviour
     {
-        GUILayout.BeginArea(new Rect(10, 10, 300, 300));
-
-        var networkManager = NetworkManager.Singleton;
-        if (!networkManager.IsClient && !networkManager.IsServer)
+        private void OnGUI()
         {
-            if (GUILayout.Button("Host")) networkManager.StartHost();
-            if (GUILayout.Button("Client")) networkManager.StartClient();
-            if (GUILayout.Button("Server")) networkManager.StartServer();
-        }
-        else
-        {
-            GUILayout.Label($"Mode: {(networkManager.IsHost ? "Host" : networkManager.IsServer ? "Server" : "Client")}");
-        }
+            GUILayout.BeginArea(new Rect(10, 10, 300, 300));
 
-        GUILayout.EndArea();
+            var networkManager = NetworkManager.Singleton;
+            if (!networkManager.IsClient && !networkManager.IsServer)
+            {
+                if (GUILayout.Button("Host")) networkManager.StartHost();
+                if (GUILayout.Button("Client")) networkManager.StartClient();
+                if (GUILayout.Button("Server")) networkManager.StartServer();
+            }
+
+            GUILayout.EndArea();
+        }
     }
 }

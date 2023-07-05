@@ -1,20 +1,38 @@
 using UnityEngine;
 
-public class MeleeAttack : MonoBehaviour
+namespace LocalPlayer
 {
-    [SerializeField] private float _attackRange = 3f;
-    [SerializeField] private float _attackRadius = 0.75f;
-    [SerializeField] private float _attackForce = 250f;
-
-    public float AttackRange { get; }
-
-    public void Attack()
+    public class MeleeAttack : MonoBehaviour
     {
-        var hits = Physics.OverlapCapsule(transform.position, transform.position + transform.forward * _attackRange,
-            _attackRadius);
+        [Tooltip("The range of the attack.")] [SerializeField] [Range(0, 5f)]
+        private float attackRange = 3f;
 
-        foreach (var hit in hits)
-            if (hit.TryGetComponent<Rigidbody>(out var rigidbody))
-                rigidbody.AddForce(transform.forward * _attackForce, ForceMode.Impulse);
+        [Tooltip("The radius of the attack.")] [SerializeField] [Range(0, 1f)]
+        private float attackRadius = 0.75f;
+
+        [Tooltip("The force of the attack.")] [SerializeField] [Range(0, 1000f)]
+        private float attackForce = 250f;
+
+        /// <summary>
+        ///     The range of the attack.
+        /// </summary>
+        public float AttackRange => attackRange;
+
+        /// <summary>
+        ///     Hit all rigidbodies in the attack range.
+        /// </summary>
+        public void Attack()
+        {
+            var cameraTransform = transform;
+            var cameraTransformPosition = cameraTransform.position;
+
+            var hits = new Collider[5];
+            var numHits = Physics.OverlapCapsuleNonAlloc(cameraTransformPosition,
+                cameraTransformPosition + cameraTransform.forward * attackRange, attackRadius, hits);
+
+            for (var i = 0; i < numHits; i++)
+                if (hits[i].TryGetComponent<Rigidbody>(out var rigidbodyComponent))
+                    rigidbodyComponent.AddForce(transform.forward * attackForce, ForceMode.Impulse);
+        }
     }
 }

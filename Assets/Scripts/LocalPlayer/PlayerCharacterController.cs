@@ -45,7 +45,7 @@ namespace LocalPlayer
 
         [Tooltip("The length of the raycast used to detect the ground in m")]
         [SerializeField]
-        private float rayLength = 1.5f; // m
+        private float rayLength = 1.1f; // m
 
         [Tooltip("The strength of the spring used to keep the player grounded in N/m")]
         [SerializeField]
@@ -59,26 +59,53 @@ namespace LocalPlayer
         [SerializeField]
         private LayerMask groundLayerMask;
 
-        private Vector2 _direction;
-
         private bool _floatingEnabled = true;
+        private bool _canJump = true;
+        private bool _rayDidHit;
+        private RaycastHit _hitInfo;
+
+        private Vector2 _movementInput;
 
         private Rigidbody _rigidbody;
 
-        public Vector2 Direction
+        /// <summary>
+        ///     Whether or not the player can move.
+        /// </summary>
+        public bool MovementEnabled { get; set; } = true;
+
+        /// <summary>
+        ///     The movement input of the player.
+        /// </summary>
+        public Vector2 MovementInput
         {
-            get => _direction;
-            set => _direction = value.normalized;
+            get => _movementInput;
+            set => _movementInput = value.normalized;
         }
 
-        public bool Jumping { get; set; }
-        public bool MovementEnabled { get; set; } = true;
+        /// <summary>
+        ///     Whether or not the player is grounded.
+        /// </summary>
         public bool IsGrounded { get; private set; }
+
+        /// <summary>
+        ///     The layer mask used to detect the ground.
+        /// </summary>
         public LayerMask GroundLayerMask => groundLayerMask;
 
-        public Vector3 Movement => _rigidbody.velocity;
+        /// <summary>
+        ///     The velocity of the player.
+        /// </summary>
+        public Vector3 Velocity => _rigidbody.velocity;
+
+        /// <summary>
+        ///     The maximum speed of the player.
+        /// </summary>
         public float MaxSpeed => maxSpeed;
-        public bool Stopping => Direction == Vector2.zero;
+
+        /// <summary>
+        ///     Whether or not the player is stopping.
+        /// </summary>
+        public bool Stopping => MovementInput == Vector2.zero;
 
         private void Awake()
         {
@@ -90,104 +117,110 @@ namespace LocalPlayer
             OnJump += JumpAsync;
         }
 
-        private void Update()
-        {
-            if (Jumping && IsGrounded) OnJump?.Invoke();
-        }
-
         private void FixedUpdate()
         {
-            if (MovementEnabled)
-            {
-                MovementLogic();
-            }
-            Floating();
+            if (MovementEnabled) MovementLogic();
+            GroundCheck();
+            if (_floatingEnabled) Floating();
+        }
+
+        public void Jump()
+        {
+            if (IsGrounded && _canJump) OnJump?.Invoke();
         }
 
         private void MovementLogic()
         {
-            var velocity = _rigidbody.velocity;
-            var horizontalVelocity = new Vector3(velocity.x, 0f, velocity.z);
+            var horizontalVelocity = new Vector3(Velocity.x, 0f, Velocity.z);
 
             var playerTransform = transform;
-            var playerDirection = Direction.x * playerTransform.right + Direction.y * playerTransform.forward;
+            var playerDirection = MovementInput.x * playerTransform.right + MovementInput.y * playerTransform.forward;
             playerDirection.Normalize();
 
             Vector3 finalForce;
 
             if (playerDirection != Vector3.zero)
             {
-                var horizontalRemappedVelocity = horizontalVelocity.normalized * Mathf.Clamp01(horizontalVelocity.magnitude / maxSpeed);
+                var horizontalRemappedVelocity = horizontalVelocity.normalized *
+                                                 Mathf.Clamp01(horizontalVelocity.magnitude / maxSpeed);
 
                 finalForce = playerDirection - horizontalRemappedVelocity;
 
                 finalForce *= acceleration;
-                finalForce *= (IsGrounded ? 1 : airControl);
+                finalForce *= IsGrounded ? 1 : airControl;
             }
             else
             {
                 finalForce = -horizontalVelocity * deceleration;
 
-                finalForce *= (IsGrounded ? 1 : airBrake);
+                finalForce *= IsGrounded ? 1 : airBrake;
             }
 
             _rigidbody.AddForce(finalForce * Time.fixedDeltaTime, ForceMode.Acceleration);
         }
 
-        private void OnGUI()
+        private void GroundCheck()
         {
-            GUI.Label(new Rect(10, 10, 100, 20), $"Speed: {Movement.magnitude}");
+            var ray = new Ray(transform.position, Vector3.down);
+            _rayDidHit = Physics.Raycast(ray, out _hitInfo, rayLength, groundLayerMask);
+
+            var wasGrounded = IsGrounded;
+            IsGrounded = _rayDidHit && _hitInfo.distance <= rideHeight;
+
+            if (IsGrounded && !wasGrounded) OnLand?.Invoke(_rigidbody.velocity.y);
         }
 
         private void Floating()
         {
-            var ray = new Ray(transform.position, Vector3.down);
-            var rayDidHit = Physics.Raycast(ray, out var hitInfo, rayLength, groundLayerMask);
+            if (!_rayDidHit) return;
 
-            var wasGrounded = IsGrounded;
-            IsGrounded = rayDidHit && hitInfo.distance <= rideHeight;
+            var hitBody = _hitInfo.rigidbody;
 
-            if (!_floatingEnabled) return;
+            var otherVel = hitBody ? hitBody.velocity : Vector3.zero;
 
-            if (IsGrounded && !wasGrounded) OnLand?.Invoke(_rigidbody.velocity.y);
+            var rayDirVel = Vector3.Dot(Vector3.down, _rigidbody.velocity);
+            var otherDirVel = Vector3.Dot(Vector3.down, otherVel);
 
-            if (rayDidHit)
-            {
-                var otherVel = Vector3.zero;
-                var hitBody = hitInfo.rigidbody;
-                if (hitBody != null) otherVel = hitBody.velocity;
+            var relVel = rayDirVel - otherDirVel;
 
-                var rayDirVel = Vector3.Dot(Vector3.down, _rigidbody.velocity);
-                var otherDirVel = Vector3.Dot(Vector3.down, otherVel);
+            var x = _hitInfo.distance - rideHeight;
 
-                var relVel = rayDirVel - otherDirVel;
+            var springForce = x * rideSpringStrength - relVel * rideSpringDamper;
 
-                var x = hitInfo.distance - rideHeight;
+            _rigidbody.AddForce(Vector3.down * springForce, ForceMode.Acceleration);
 
-                var springForce = x * rideSpringStrength - relVel * rideSpringDamper;
-
-                _rigidbody.AddForce(Vector3.down * springForce, ForceMode.Acceleration);
-
-                if (hitBody != null)
-                    hitBody.AddForceAtPosition(Vector3.up * springForce, hitInfo.point, ForceMode.Acceleration);
-            }
+            if (hitBody)
+                hitBody.AddForceAtPosition(Vector3.up * springForce, _hitInfo.point, ForceMode.Acceleration);
         }
 
-        // Events
+        /// <summary>
+        ///     Invoked when the player jumps.
+        /// </summary>
         public event UnityAction OnJump;
-        public event UnityAction<float> OnLand; // the float represents the y velocity of the player when they landed
+
+        /// <summary>
+        ///     Invoked when the player lands.
+        /// </summary>
+        /// <remarks>
+        ///    The float represents the y velocity of the player when they landed.
+        ///    This can be used to play a landing animation.
+        /// </remarks>
+        public event UnityAction<float> OnLand;
 
         private async void JumpAsync()
         {
-            var jumpForce = Vector3.up * Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
-
             _floatingEnabled = false;
+            _canJump = false;
 
-            _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, 0f, _rigidbody.velocity.z);
+            _rigidbody.velocity = new Vector3(Velocity.x, 0f, Velocity.z);
+
+            var jumpForce = Vector3.up * Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
             _rigidbody.AddForce(jumpForce, ForceMode.VelocityChange);
-            Jumping = false;
+
             await Task.Delay(TimeSpan.FromSeconds(0.4f));
+
             _floatingEnabled = true;
+            _canJump = true;
         }
     }
 }

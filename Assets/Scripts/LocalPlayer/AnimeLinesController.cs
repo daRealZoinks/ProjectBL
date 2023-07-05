@@ -5,8 +5,14 @@ namespace LocalPlayer
 {
     public class AnimeLinesController : MonoBehaviour
     {
+        [Tooltip("Reference to the player character controller")]
         [SerializeField] private PlayerCharacterController playerCharacterController;
+
+        [Tooltip("Reference to the anime lines visual effect")]
         [SerializeField] private VisualEffect animeLines;
+
+        [Tooltip("The maximum speed at which the anime lines will be visible")]
+        [SerializeField] private float maxSpeed = 30f;
 
         private void Start()
         {
@@ -16,7 +22,7 @@ namespace LocalPlayer
 
         private void Update()
         {
-            if (playerCharacterController.Movement.magnitude > playerCharacterController.MaxSpeed * 2)
+            if (playerCharacterController.Velocity.magnitude >= maxSpeed)
                 animeLines.Play();
             else
                 animeLines.Stop();

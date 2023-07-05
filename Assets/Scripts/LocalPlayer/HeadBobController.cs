@@ -7,14 +7,10 @@ namespace LocalPlayer
         [SerializeField] private bool headBobEnabled = true;
 
         [Header("Bobbing")]
-        [Tooltip("The amount of bobbing when the player is moving")]
-        [SerializeField]
-        [Range(0, 0.1f)]
+        [Tooltip("The amount of bobbing when the player is moving")] [SerializeField] [Range(0, 0.1f)]
         private float amplitude = 0.08f;
 
-        [Tooltip("The speed of the bobbing when the player is moving")]
-        [SerializeField]
-        [Range(0, 30f)]
+        [Tooltip("The speed of the bobbing when the player is moving")] [SerializeField] [Range(0, 30f)]
         private float frequency = 18.5f;
 
         [SerializeField] private PlayerCharacterController playerCharacterController;
@@ -23,6 +19,9 @@ namespace LocalPlayer
         private Vector3 _startPosition;
         private Vector3 _targetLookAtPosition;
 
+        /// <summary>
+        ///     Whether or not head bob is enabled
+        /// </summary>
         public bool HeadBobEnabled
         {
             get => headBobEnabled;
@@ -36,20 +35,22 @@ namespace LocalPlayer
 
         private void Update()
         {
-            if (!headBobEnabled) return;
+            if (!HeadBobEnabled) return;
 
-            if ((!playerCharacterController.IsGrounded || playerCharacterController.Stopping) && !playerWallRunController.IsWallRunning)
+            // if the player is not grounded or stopping, or if the player is wall running, reset the head bob position
+            if ((!playerCharacterController.IsGrounded || playerCharacterController.Stopping) &&
+                !playerWallRunController.IsWallRunning)
             {
                 transform.localPosition = Vector3.Lerp(transform.localPosition, _startPosition, Time.deltaTime);
                 return;
             }
 
-            if (playerCharacterController.Movement.magnitude > 0 || playerWallRunController.IsWallRunning)
-            {
-                var speed = Mathf.Clamp01(playerCharacterController.Movement.magnitude /
-                                          playerCharacterController.MaxSpeed);
-                transform.localPosition = _startPosition + GetHeadBobPosition(speed);
-            }
+            // if the player is not moving and not wall running, reset the head bob position
+            if (!(playerCharacterController.Velocity.magnitude > 0) && !playerWallRunController.IsWallRunning) return;
+            
+            var speed = Mathf.Clamp01(playerCharacterController.Velocity.magnitude /
+                                      playerCharacterController.MaxSpeed);
+            transform.localPosition = _startPosition + GetHeadBobPosition(speed);
         }
 
         private Vector3 GetHeadBobPosition(float speed)

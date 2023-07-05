@@ -6,27 +6,26 @@ namespace LocalPlayer
     {
         [SerializeField] private bool lateralTiltEnabled = true;
 
-        [Header("Tilt")]
-        [Tooltip("The angle of tilt when the player is moving")]
-        [SerializeField]
-        [Range(0, 10f)]
+        [Header("Tilt")] [Tooltip("The angle of tilt when the player is moving")] [SerializeField] [Range(0, 10f)]
         private float angle = 2f;
 
-        [Tooltip("The angle of tilt when the player is wallrunning")]
-        [SerializeField]
-        [Range(0, 10f)]
+        [Tooltip("The angle of tilt when the player is wall running")] [SerializeField] [Range(0, 10f)]
+        private float wallRunAngle = 5f;
 
-        private float wallrunAngle = 5f;
-        [Tooltip("The speed of the tilt when the player is moving")]
-        [SerializeField]
-        [Range(0, 15f)]
+        [Tooltip("The speed of the tilt when the player is moving")] [SerializeField] [Range(0, 15f)]
         private float speed = 5f;
 
+        [Tooltip("The player character controller")]
         [SerializeField] private PlayerCharacterController playerCharacterController;
+
+        [Tooltip("The player wall run controller")]
         [SerializeField] private PlayerWallRunController playerWallRunController;
 
         private Vector3 _startRotation;
 
+        /// <summary>
+        ///     Whether or not the lateral tilt is enabled.
+        /// </summary>
         public bool LateralTiltEnabled
         {
             get => lateralTiltEnabled;
@@ -40,13 +39,13 @@ namespace LocalPlayer
 
         private void Update()
         {
-            if (!lateralTiltEnabled) return;
+            if (!LateralTiltEnabled) return;
 
             var targetRotation = _startRotation;
 
             if (!playerCharacterController.Stopping && playerCharacterController.IsGrounded)
             {
-                var directionOfMovement = transform.InverseTransformDirection(playerCharacterController.Movement);
+                var directionOfMovement = transform.InverseTransformDirection(playerCharacterController.Velocity);
 
                 targetRotation.z -= directionOfMovement.normalized.x * angle;
             }
@@ -57,8 +56,8 @@ namespace LocalPlayer
 
             if (playerWallRunController.IsWallRunning)
             {
-                if (playerWallRunController.IsWallRight) targetRotation.z = wallrunAngle;
-                else if (playerWallRunController.IsWallLeft) targetRotation.z = -wallrunAngle;
+                if (playerWallRunController.IsWallRight) targetRotation.z = wallRunAngle;
+                else if (playerWallRunController.IsWallLeft) targetRotation.z = -wallRunAngle;
                 else targetRotation.z = 0;
             }
 

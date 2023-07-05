@@ -1,90 +1,77 @@
-using LocalPlayer;
 using UnityEngine;
 
-public class ArtificialIntelligence : MonoBehaviour
+namespace LocalPlayer
 {
-    [SerializeField] private PlayerCameraController playerCameraController;
-    [SerializeField] private MeleeAttack meleeAttack;
-    [SerializeField] private Transform target;
-
-    private PlayerCharacterController _playerCharacterController;
-
-    public Transform Target
+    public class ArtificialIntelligence : MonoBehaviour
     {
-        get => target;
-        set => target = value;
-    }
+        [Tooltip("The player camera controller to use for looking at the target.")] [SerializeField]
+        private PlayerCameraController playerCameraController;
 
-    private void Awake()
-    {
-        _playerCharacterController = GetComponent<PlayerCharacterController>();
-    }
+        [Tooltip("The melee attack to use when the target is close enough.")] [SerializeField]
+        private MeleeAttack meleeAttack;
 
-    private void Update()
-    {
-        if (Target == null)
+        private PlayerCharacterController _playerCharacterController;
+
+        /// <summary>
+        ///     The target to move towards.
+        /// </summary>
+        public Transform MoveTarget { get; set; }
+
+        /// <summary>
+        ///     The target to look at.
+        /// </summary>
+        public Transform LookTarget { get; set; }
+
+        private void Awake()
         {
-            _playerCharacterController.Direction = Vector2.zero;
-            playerCameraController.Look = Vector2.zero;
-
-            return;
+            _playerCharacterController = GetComponent<PlayerCharacterController>();
         }
 
-        _playerCharacterController.Direction = MoveTowards(Target.position);
+        private void Update()
+        {
+            if (!MoveTarget) _playerCharacterController.MovementInput = Vector2.zero;
+            if (!LookTarget) playerCameraController.LookInput = Vector2.zero;
+            if (!MoveTarget || !LookTarget) return;
 
-        var distanceFromCharacterToTarget = (_playerCharacterController.transform.position - Target.position).magnitude;
+            var targetPosition = MoveTarget.position;
 
-        if (distanceFromCharacterToTarget < meleeAttack.AttackRange) meleeAttack.Attack();
+            _playerCharacterController.MovementInput = MoveTowards(targetPosition);
+            playerCameraController.LookInput = LookAt(LookTarget.position);
 
-        playerCameraController.Look = LookAt(Target.position);
-    }
+            var distanceFromCharacterToTarget =
+                (_playerCharacterController.transform.position - targetPosition).magnitude;
+            if (distanceFromCharacterToTarget < meleeAttack.AttackRange) meleeAttack.Attack();
+        }
 
-    private void OnDrawGizmos()
-    {
-        if (Target == null) return;
+        private Vector2 MoveTowards(Vector3 target)
+        {
+            var artificialIntelligenceTransform = transform;
 
-        // draw a line from the character to the target
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(playerCameraController.transform.position, Target.position);
+            var directionToTarget = target - artificialIntelligenceTransform.position;
+            directionToTarget.y = 0f; // Ignore the vertical component
 
-        // draw a line for the direction the character is moving
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(transform.position,
-            new Vector3(_playerCharacterController.Direction.x, 0f, _playerCharacterController.Direction.y) +
-            transform.position);
+            var localDirection = Quaternion.Inverse(artificialIntelligenceTransform.rotation) * directionToTarget;
 
-        // draw a line for the direction the character is facing
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(playerCameraController.transform.position,
-            playerCameraController.transform.forward + playerCameraController.transform.position);
-    }
+            Vector2 directionToTake = new(localDirection.x, localDirection.z);
 
-    private Vector2 MoveTowards(Vector3 target)
-    {
-        var directionToTarget = target - transform.position;
-        directionToTarget.y = 0f; // Ignore the vertical component
+            return directionToTake;
+        }
 
-        var localDirection = Quaternion.Inverse(transform.rotation) * directionToTarget;
+        private Vector2 LookAt(Vector3 target)
+        {
+            var directionToTarget = target - transform.position;
+            var targetRotation = Quaternion.LookRotation(directionToTarget);
+            var characterRotation = Quaternion.LookRotation(transform.forward);
 
-        Vector2 directionToTake = new(localDirection.x, localDirection.z);
+            var characterRotationDifference = targetRotation * Quaternion.Inverse(characterRotation);
 
-        return directionToTake;
-    }
+            var characterEulerRotation = characterRotationDifference.eulerAngles;
+            characterEulerRotation.x = Mathf.Repeat(characterEulerRotation.x + 180f, 360f) - 180f;
+            characterEulerRotation.y = Mathf.Repeat(characterEulerRotation.y + 180f, 360f) - 180f;
 
-    private Vector2 LookAt(Vector3 target)
-    {
-        var directionToTarget = target - transform.position;
-        var targetRotation = Quaternion.LookRotation(directionToTarget);
-        var characterRotation = Quaternion.LookRotation(transform.forward);
+            var desiredRotation = new Vector2(characterEulerRotation.y, 0f); // TODO: make the bot look up and down
 
-        var characterRotationDifference = targetRotation * Quaternion.Inverse(characterRotation);
-
-        var characterEulerRotation = characterRotationDifference.eulerAngles;
-        characterEulerRotation.x = Mathf.Repeat(characterEulerRotation.x + 180f, 360f) - 180f;
-        characterEulerRotation.y = Mathf.Repeat(characterEulerRotation.y + 180f, 360f) - 180f;
-
-        var desiredRotation = new Vector2(characterEulerRotation.y, 0f); // TODO: make the bot look up and down
-
-        return desiredRotation;
+            return desiredRotation;
+        }
     }
 }

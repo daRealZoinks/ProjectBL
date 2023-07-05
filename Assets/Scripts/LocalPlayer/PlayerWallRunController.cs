@@ -9,27 +9,56 @@ namespace LocalPlayer
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerWallRunController : MonoBehaviour
     {
-        [SerializeField] private float wallJumpHeight = 3;
-        [SerializeField] private float wallJumpSideForce = 8;
-        [SerializeField] private float wallJumpForwardForce = 8;
-        [SerializeField] private float wallRunForwardImpulse = 8;
-        [SerializeField] private float wallCheckDistance = 0.75f;
+        [Tooltip("The height of the jump when the player jumps off a wall.")]
+        [SerializeField]
+        private float wallJumpHeight = 3f;
+
+        [Tooltip("The amount of force applied to the player character when jumping off a wall to the side.")]
+        [SerializeField]
+        private float wallJumpSideForce = 8f;
+
+        [Tooltip("The amount of forward force applied to the player character when jumping off a wall.")]
+        [SerializeField]
+        private float wallJumpForwardForce = 8f;
+
+        [Tooltip("The amount of forward impulse applied to the player character when starting a wall run.")]
+        [SerializeField]
+        private float wallRunForwardImpulse = 8f;
+
+        [Tooltip("The distance at which the player character checks for walls to wall run on.")]
+        [Range(0.1f, 2f)]
+        [SerializeField]
+        private float wallCheckDistance = 0.75f;
+
+        [Tooltip("The amount of time the player character has to wait before being able to wall run again.")]
+        [SerializeField]
+        [Range(0.1f, 1f)]
+        private float wallRunCooldown = 0.4f;
 
         private PlayerCharacterController _playerCharacterController;
+
+        private RaycastHit _leftHitInfo;
+        private RaycastHit _rightHitInfo;
+
+        private bool _canWallJump = true;
+
         private Rigidbody _rigidbody;
-
-        private bool _isWallRight;
-        private bool _isWallLeft;
-
-        private RaycastHit _righthitinfo;
-        private RaycastHit _lefthitinfo;
         private bool _wallRunningEnabled = true;
 
-        public bool IsWallRight => _isWallRight;
-        public bool IsWallLeft => _isWallLeft;
-        public bool IsWallRunning => _isWallRight || _isWallLeft;
+        /// <summary>
+        ///     Whether the player character is currently running on a wall to the right.
+        /// </summary>
+        public bool IsWallRight { get; private set; }
 
-        public event UnityAction OnWallJump;
+        /// <summary>
+        ///     Whether the player character is currently running on a wall to the left.
+        /// </summary>
+        public bool IsWallLeft { get; private set; }
+
+        /// <summary>
+        ///     Whether the player character is currently running on a wall.
+        /// </summary>
+        public bool IsWallRunning => IsWallRight || IsWallLeft;
 
         private void Awake()
         {
@@ -42,11 +71,16 @@ namespace LocalPlayer
             OnWallJump += WallJumpAsync;
         }
 
+        public void WallJump()
+        {
+            if (IsWallRunning && _canWallJump) OnWallJump?.Invoke();
+        }
+
         private void Update()
         {
-            if (_playerCharacterController.Jumping && (_isWallRight || _isWallLeft)) OnWallJump?.Invoke();
-
-            _playerCharacterController.MovementEnabled = !(_isWallRight || _isWallLeft);
+            // Disable movement if the player character is wall running.
+            // This is to prevent the player character from moving away from the wall.
+            _playerCharacterController.MovementEnabled = !IsWallRunning;
         }
 
         private void FixedUpdate()
@@ -55,43 +89,57 @@ namespace LocalPlayer
 
             if (_playerCharacterController.IsGrounded)
             {
-                _isWallRight = false;
-                _isWallLeft = false;
+                IsWallRight = false;
+                IsWallLeft = false;
                 return;
             }
 
-            Ray rightRay = new(transform.position, transform.right);
-            Ray leftRay = new(transform.position, -transform.right);
+            var playerTransform = transform;
+            var playerTransformPosition = playerTransform.position;
+            var playerTransformRight = playerTransform.right;
 
-            var wasWallRight = _isWallRight;
-            var wasWallLeft = _isWallLeft;
+            Ray rightRay = new(playerTransformPosition, playerTransformRight);
+            Ray leftRay = new(playerTransformPosition, -playerTransformRight);
 
-            if (!_isWallRight) _isWallRight = Physics.Raycast(rightRay, out _righthitinfo, wallCheckDistance, _playerCharacterController.GroundLayerMask);
-            if (!_isWallLeft) _isWallLeft = Physics.Raycast(leftRay, out _lefthitinfo, wallCheckDistance, _playerCharacterController.GroundLayerMask);
+            var wasWallRight = IsWallRight;
+            var wasWallLeft = IsWallLeft;
 
-            if (_isWallRight && !wasWallRight)
+            if (!IsWallRight)
+                IsWallRight = Physics.Raycast(rightRay, out _rightHitInfo, wallCheckDistance,
+                    _playerCharacterController.GroundLayerMask);
+
+            if (!IsWallLeft)
+                IsWallLeft = Physics.Raycast(leftRay, out _leftHitInfo, wallCheckDistance,
+                    _playerCharacterController.GroundLayerMask);
+
+            if (IsWallRight && !wasWallRight)
             {
-                var forwardForce = -Vector3.Cross(_righthitinfo.normal, transform.up) * wallRunForwardImpulse;
+                var forwardForce = -Vector3.Cross(_rightHitInfo.normal, transform.up) * wallRunForwardImpulse;
 
                 _rigidbody.AddForce(forwardForce, ForceMode.VelocityChange);
             }
 
-            if (_isWallLeft && !wasWallLeft)
+            if (IsWallLeft && !wasWallLeft)
             {
-                var forwardForce = Vector3.Cross(_lefthitinfo.normal, transform.up) * wallRunForwardImpulse;
+                var forwardForce = Vector3.Cross(_leftHitInfo.normal, transform.up) * wallRunForwardImpulse;
 
                 _rigidbody.AddForce(forwardForce, ForceMode.VelocityChange);
             }
 
-            if (_isWallRight) _rigidbody.AddForce(-_righthitinfo.normal, ForceMode.Acceleration);
-            if (_isWallLeft) _rigidbody.AddForce(-_lefthitinfo.normal, ForceMode.Acceleration);
+            if (IsWallRight) _rigidbody.AddForce(-_rightHitInfo.normal, ForceMode.Acceleration);
+            if (IsWallLeft) _rigidbody.AddForce(-_leftHitInfo.normal, ForceMode.Acceleration);
         }
+
+        /// <summary>
+        ///     Event invoked when the player character jumps off a wall.
+        /// </summary>
+        public event UnityAction OnWallJump;
 
         private async void WallJumpAsync()
         {
             var sideForce = Vector3.zero;
-            if (_isWallRight) sideForce = _righthitinfo.normal * wallJumpSideForce;
-            if (_isWallLeft) sideForce = _lefthitinfo.normal * wallJumpSideForce;
+            if (IsWallRight) sideForce = _rightHitInfo.normal * wallJumpSideForce;
+            if (IsWallLeft) sideForce = _leftHitInfo.normal * wallJumpSideForce;
 
             var jumpForce = Vector3.up * Mathf.Sqrt(wallJumpHeight * -2 * Physics.gravity.y);
 
@@ -100,32 +148,35 @@ namespace LocalPlayer
             var finalForce = jumpForce + sideForce + forwardForce;
 
             _wallRunningEnabled = false;
+            _canWallJump = false;
 
-            _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, 0f, _rigidbody.velocity.z);
+            var rigidbodyVelocity = _rigidbody.velocity;
+            rigidbodyVelocity = new Vector3(rigidbodyVelocity.x, 0f, rigidbodyVelocity.z);
+            _rigidbody.velocity = rigidbodyVelocity;
 
-            if (_isWallRight)
+            if (IsWallRight)
             {
-                var velocity = Vector3.Project(_rigidbody.velocity, _righthitinfo.normal);
+                var velocity = Vector3.Project(_rigidbody.velocity, _rightHitInfo.normal);
 
                 _rigidbody.velocity -= velocity;
             }
 
-            if (_isWallLeft)
+            if (IsWallLeft)
             {
-                var velocity = Vector3.Project(_rigidbody.velocity, _lefthitinfo.normal);
+                var velocity = Vector3.Project(_rigidbody.velocity, _leftHitInfo.normal);
 
                 _rigidbody.velocity -= velocity;
             }
 
-            _isWallRight = false;
-            _isWallLeft = false;
+            IsWallRight = false;
+            IsWallLeft = false;
 
             _rigidbody.AddForce(finalForce, ForceMode.VelocityChange);
 
-            _playerCharacterController.Jumping = false;
+            await Task.Delay(TimeSpan.FromSeconds(wallRunCooldown));
 
-            await Task.Delay(TimeSpan.FromSeconds(0.4f));
             _wallRunningEnabled = true;
+            _canWallJump = true;
         }
     }
 }

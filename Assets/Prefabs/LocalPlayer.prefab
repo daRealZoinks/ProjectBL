@@ -323,7 +323,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: 76fbd0f8522442d44a95c391eaa6dd24,
     type: 3}
-  m_NotificationBehavior: 1
+  m_NotificationBehavior: 2
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
@@ -336,19 +336,67 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8135219768289751768}
+        m_TargetAssemblyTypeName: LocalPlayer.InputProvider, LocalPlayer
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: b872022c-2846-4d73-b814-7e72074e6c38
     m_ActionName: Player/Move[/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8135219768289751768}
+        m_TargetAssemblyTypeName: LocalPlayer.InputProvider, LocalPlayer
+        m_MethodName: OnLook
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: c91548ca-e810-4045-9c1b-5e9b8aa532f3
     m_ActionName: Player/Look[/Mouse/delta]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8135219768289751768}
+        m_TargetAssemblyTypeName: LocalPlayer.InputProvider, LocalPlayer
+        m_MethodName: OnFire
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 92d5ff45-9d3b-4044-a080-dc787e79c680
     m_ActionName: Player/Fire[/Mouse/leftButton]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8135219768289751768}
+        m_TargetAssemblyTypeName: LocalPlayer.InputProvider, LocalPlayer
+        m_MethodName: OnJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 1a559545-3d4f-4abf-83d6-b0db45aa5db1
     m_ActionName: Player/Jump[/Keyboard/space]
   - m_PersistentCalls:
@@ -391,6 +439,22 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: c0b6dbfd-5d60-44e1-9ffa-4cc0fd064369
     m_ActionName: UI/TrackedDeviceOrientation
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8135219768289751768}
+        m_TargetAssemblyTypeName: LocalPlayer.InputProvider, LocalPlayer
+        m_MethodName: OnMelee
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: bf6b9d6b-2ca9-4626-9174-787bb7efea4e
+    m_ActionName: Player/Melee[/Mouse/backButton,/Keyboard/v]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
@@ -438,6 +502,7 @@ MonoBehaviour:
   wallJumpForwardForce: 8
   wallRunForwardImpulse: 8
   wallCheckDistance: 0.75
+  wallRunCooldown: 0.4
 --- !u!114 &8135219768289751768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -452,7 +517,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCameraController: {fileID: 5571163948937526567}
   meleeAttack: {fileID: 142767125561270786}
-  jumpBufferringTime: 0.5
 --- !u!82 &5057796971305018253
 AudioSource:
   m_ObjectHideFlags: 0
@@ -653,7 +717,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd4974b06d84fad95a201173c84216b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lockCursor: 1
   sensitivity: 0.1
   playerCharacterController: {fileID: -4509371769481015721}
   minimumAngle: -90
@@ -672,6 +735,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCharacterController: {fileID: -4509371769481015721}
   animeLines: {fileID: 4498895289650377102}
+  maxSpeed: 30
 --- !u!114 &5071014682162879947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -703,7 +767,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lateralTiltEnabled: 1
   angle: 2
-  wallrunAngle: 5
+  wallRunAngle: 5
   speed: 5
   playerCharacterController: {fileID: -4509371769481015721}
   playerWallRunController: {fileID: 2121126165229120460}
@@ -719,9 +783,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2357d895fc44ffd41afd47aff1b7b184, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackRange: 3
-  _attackRadius: 0.75
-  _attackForce: 250
+  attackRange: 3
+  attackRadius: 0.75
+  attackForce: 250
 --- !u!1001 &6613184410001889587
 PrefabInstance:
   m_ObjectHideFlags: 0
