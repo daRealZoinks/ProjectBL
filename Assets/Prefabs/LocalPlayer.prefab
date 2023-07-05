@@ -436,7 +436,8 @@ MonoBehaviour:
   wallJumpHeight: 3
   wallJumpSideForce: 8
   wallJumpForwardForce: 8
-  wallCheckDistance: 0.56
+  wallRunForwardImpulse: 8
+  wallCheckDistance: 0.75
 --- !u!114 &8135219768289751768
 MonoBehaviour:
   m_ObjectHideFlags: 0

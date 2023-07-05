@@ -87,7 +87,7 @@ namespace LocalPlayer
 
         private void Start()
         {
-            OnJump += Jump;
+            OnJump += JumpAsync;
         }
 
         private void Update()
@@ -117,12 +117,9 @@ namespace LocalPlayer
 
             if (playerDirection != Vector3.zero)
             {
-                finalForce = playerDirection;
+                var horizontalRemappedVelocity = horizontalVelocity.normalized * Mathf.Clamp01(horizontalVelocity.magnitude / maxSpeed);
 
-                if (horizontalVelocity.magnitude > maxSpeed)
-                {
-                    finalForce -= horizontalVelocity.normalized;
-                }
+                finalForce = playerDirection - horizontalRemappedVelocity;
 
                 finalForce *= acceleration;
                 finalForce *= (IsGrounded ? 1 : airControl);
@@ -135,6 +132,11 @@ namespace LocalPlayer
             }
 
             _rigidbody.AddForce(finalForce * Time.fixedDeltaTime, ForceMode.Acceleration);
+        }
+
+        private void OnGUI()
+        {
+            GUI.Label(new Rect(10, 10, 100, 20), $"Speed: {Movement.magnitude}");
         }
 
         private void Floating()
@@ -175,7 +177,7 @@ namespace LocalPlayer
         public event UnityAction OnJump;
         public event UnityAction<float> OnLand; // the float represents the y velocity of the player when they landed
 
-        private async void Jump()
+        private async void JumpAsync()
         {
             var jumpForce = Vector3.up * Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
 
