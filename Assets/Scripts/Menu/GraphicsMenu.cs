@@ -10,29 +10,35 @@ using UnityEngine.UIElements;
 
 public class GraphicsMenu : MonoBehaviour
 {
+    private VisualElement _graphicsMenu;
+    private VisualElement _optionsMenu;
+
+    private DropdownField _fullscreenModeDropdown;
+    private DropdownField _resolutionDropdown;
+    private DropdownField _refreshRateDropdown;
+    private DropdownField _qualityDropdown;
+    private DropdownField _motionBlurDropdown;
     private DropdownField _antiAliasingDropdown;
 
     private Button _backButton;
 
-    private DropdownField _fullscreenModeDropdown;
-    private VisualElement _graphicsMenu;
-    private DropdownField _motionBlurDropdown;
-    private VisualElement _optionsMenu;
-    private DropdownField _qualityDropdown;
-    private DropdownField _refreshRateDropdown;
-    private DropdownField _resolutionDropdown;
-
-    private VisualElement _root;
     private Settings _settings;
 
     private void Awake()
     {
-        _root = GetComponent<UIDocument>().rootVisualElement;
+        var root = GetComponent<UIDocument>().rootVisualElement;
 
-        _optionsMenu = _root.Q<VisualElement>("options-menu");
-        _graphicsMenu = _root.Q<VisualElement>("graphics-menu");
+        _optionsMenu = root.Q<VisualElement>("options-menu");
+        _graphicsMenu = root.Q<VisualElement>("graphics-menu");
 
-        _backButton = _root.Q<Button>("graphics-menu-back-button");
+        _fullscreenModeDropdown = root.Q<DropdownField>("fullscreen-mode-dropdown");
+        _resolutionDropdown = root.Q<DropdownField>("resolution-dropdown");
+        _refreshRateDropdown = root.Q<DropdownField>("refresh-rate-dropdown");
+        _qualityDropdown = root.Q<DropdownField>("quality-dropdown");
+        _motionBlurDropdown = root.Q<DropdownField>("motion-blur-dropdown");
+        _antiAliasingDropdown = root.Q<DropdownField>("anti-aliasing-dropdown");
+
+        _backButton = root.Q<Button>("graphics-menu-back-button");
         _backButton.clicked += () =>
         {
             _optionsMenu.style.display = DisplayStyle.Flex;
@@ -40,6 +46,8 @@ public class GraphicsMenu : MonoBehaviour
         };
 
         _settings = ReadSettings();
+
+        ApplySettings(_settings);
 
         InitializeFullscreenModeDropdown();
         InitializeResolutionDropdown();
@@ -69,8 +77,6 @@ public class GraphicsMenu : MonoBehaviour
             settings.fullscreenMode = Screen.fullScreenMode;
             settings.resolution = Screen.currentResolution;
             settings.quality = QualitySettings.GetQualityLevel();
-            // settings.motionBlur = 0;
-            // settings.antiAliasing = 0;
 
             SaveSettings();
         }
@@ -78,11 +84,14 @@ public class GraphicsMenu : MonoBehaviour
         return settings;
     }
 
+    private void ApplySettings(Settings settings)
+    {
+        Screen.SetResolution(settings.resolution.width, settings.resolution.height, settings.fullscreenMode, settings.resolution.refreshRateRatio);
+        QualitySettings.SetQualityLevel(settings.quality);
+    }
+
     private void SaveSettings()
     {
-        // settings.MotionBlur = 
-        // settings.AntiAliasing = 
-
         string filePath;
 #if UNITY_STANDALONE_WIN
         filePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/My Games/ProjectBL/";
@@ -99,8 +108,6 @@ public class GraphicsMenu : MonoBehaviour
 
     private void InitializeFullscreenModeDropdown()
     {
-        _fullscreenModeDropdown = _root.Q<DropdownField>("fullscreen-mode-dropdown");
-
         const string exclusiveFullscreen = "Exclusive Fullscreen";
         const string fullscreenWindow = "Fullscreen Window";
         const string maximizedWindow = "Maximized Window";
@@ -116,6 +123,22 @@ public class GraphicsMenu : MonoBehaviour
         _fullscreenModeDropdown.choices.Add(maximizedWindow);
 #endif
         _fullscreenModeDropdown.choices.Add(windowed);
+
+        switch (_settings.fullscreenMode)
+        {
+            case FullScreenMode.ExclusiveFullScreen:
+                _fullscreenModeDropdown.value = exclusiveFullscreen;
+                break;
+            case FullScreenMode.FullScreenWindow:
+                _fullscreenModeDropdown.value = fullscreenWindow;
+                break;
+            case FullScreenMode.MaximizedWindow:
+                _fullscreenModeDropdown.value = maximizedWindow;
+                break;
+            case FullScreenMode.Windowed:
+                _fullscreenModeDropdown.value = windowed;
+                break;
+        }
 
         _fullscreenModeDropdown.RegisterValueChangedCallback(evt =>
         {
@@ -143,29 +166,10 @@ public class GraphicsMenu : MonoBehaviour
 
             SaveSettings();
         });
-
-        switch (_settings.fullscreenMode)
-        {
-            case FullScreenMode.ExclusiveFullScreen:
-                _fullscreenModeDropdown.value = exclusiveFullscreen;
-                break;
-            case FullScreenMode.FullScreenWindow:
-                _fullscreenModeDropdown.value = fullscreenWindow;
-                break;
-            case FullScreenMode.MaximizedWindow:
-                _fullscreenModeDropdown.value = maximizedWindow;
-                break;
-            case FullScreenMode.Windowed:
-                _fullscreenModeDropdown.value = windowed;
-                break;
-        }
     }
 
     private void InitializeResolutionDropdown()
     {
-        _resolutionDropdown = _root.Q<DropdownField>("resolution-dropdown");
-        _refreshRateDropdown = _root.Q<DropdownField>("refresh-rate-dropdown");
-
         var resolutions = Screen.resolutions;
 
         HashSet<RefreshRate> refreshRates = new();
@@ -184,6 +188,14 @@ public class GraphicsMenu : MonoBehaviour
             _resolutionDropdown.choices.Add($"{screenRatio.width}x{screenRatio.height}");
 
         foreach (var refreshRate in refreshRates) _refreshRateDropdown.choices.Add($"{refreshRate.value}hz");
+
+        var settingsResolution = _settings.resolution;
+        var resolutionString = $"{settingsResolution.width}x{settingsResolution.height}";
+        _resolutionDropdown.value = resolutionString;
+
+        var settingsRefreshRate = settingsResolution.refreshRateRatio.value;
+        var refreshRateString = $"{settingsRefreshRate}hz";
+        _refreshRateDropdown.value = refreshRateString;
 
         _resolutionDropdown.RegisterValueChangedCallback(evt =>
         {
@@ -231,25 +243,17 @@ public class GraphicsMenu : MonoBehaviour
 
             SaveSettings();
         });
-
-        // Set the initial value of the resolution dropdown based on the value in the settings object
-        var currentResolution = _settings.resolution;
-        var resolutionString = $"{currentResolution.width}x{currentResolution.height}";
-        _resolutionDropdown.value = resolutionString;
-
-        // Set the initial value of the refresh rate dropdown based on the value in the settings object
-        var currentRefreshRate = currentResolution.refreshRateRatio.value;
-        var refreshRateString = $"{currentRefreshRate}hz";
-        _refreshRateDropdown.value = refreshRateString;
     }
 
     private void InitializeQualityDropdown()
     {
-        _qualityDropdown = _root.Q<DropdownField>("quality-dropdown");
-
         _qualityDropdown.choices.Clear();
 
         foreach (var quality in QualitySettings.names) _qualityDropdown.choices.Add(quality);
+
+        var currentQuality = _settings.quality;
+        var qualityName = QualitySettings.names[currentQuality];
+        _qualityDropdown.value = qualityName;
 
         _qualityDropdown.RegisterValueChangedCallback(evt =>
         {
@@ -263,65 +267,6 @@ public class GraphicsMenu : MonoBehaviour
 
             SaveSettings();
         });
-
-        // Set the initial value of the quality dropdown based on the value in the settings object
-        var currentQuality = _settings.quality;
-        var qualityName = QualitySettings.names[currentQuality];
-        _qualityDropdown.value = qualityName;
-    }
-
-    private void InitializeMotionBlurDropdown()
-    {
-        _motionBlurDropdown = _root.Q<DropdownField>("motion-blur-dropdown");
-
-        _motionBlurDropdown.choices.Clear();
-
-        // TODO: get the urp volume profile 
-        VolumeProfile urpVolumeProfile = null;
-
-        var components = urpVolumeProfile.components;
-
-        MotionBlur motionBlur = null;
-
-        foreach (var component in components)
-            if (component is MotionBlur)
-            {
-                motionBlur = component as MotionBlur;
-                break;
-            }
-
-        _motionBlurDropdown.choices.Add("Off");
-        _motionBlurDropdown.choices.Add("Low Quality");
-        _motionBlurDropdown.choices.Add("Medium Quality");
-        _motionBlurDropdown.choices.Add("High Quality");
-    }
-
-    private void InitializeAntiAliasingDropdown()
-    {
-        _antiAliasingDropdown = _root.Q<DropdownField>("anti-aliasing-dropdown");
-
-        _antiAliasingDropdown.choices.Clear();
-
-        // AntialiasingMode antialiasingMode = AntialiasingMode.None;
-        // AntialiasingMode antialiasingMode = AntialiasingMode.FastApproximateAntialiasing;
-        // AntialiasingMode antialiasingMode = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
-        // AntialiasingMode antialiasingMode = AntialiasingMode.TemporalAntiAliasing;
-
-        // AntialiasingQuality antialiasingQuality = AntialiasingQuality.Low;
-        // AntialiasingQuality antialiasingQuality = AntialiasingQuality.Medium;
-        // AntialiasingQuality antialiasingQuality = AntialiasingQuality.High;
-
-        // add none to the dropdown
-        _antiAliasingDropdown.choices.Add("None");
-        _antiAliasingDropdown.choices.Add("SMAA");
-        _antiAliasingDropdown.choices.Add("FXAA");
-        _antiAliasingDropdown.choices.Add("TAA");
-
-        // add msaa to the dropdown
-        _antiAliasingDropdown.choices.Add("Off");
-        _antiAliasingDropdown.choices.Add("MSAA 2x");
-        _antiAliasingDropdown.choices.Add("MSAA 4x");
-        _antiAliasingDropdown.choices.Add("MSAA 8x");
     }
 
     [Serializable]
@@ -330,8 +275,6 @@ public class GraphicsMenu : MonoBehaviour
         [XmlElement] public FullScreenMode fullscreenMode;
         [XmlElement] public Resolution resolution;
         [XmlElement] public int quality;
-        [XmlElement] public int motionBlur;
-        [XmlElement] public int antiAliasing;
     }
 
     private struct ScreenRatio : IEquatable<ScreenRatio>
