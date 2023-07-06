@@ -111,13 +111,10 @@ public class GraphicsMenu : MonoBehaviour
 #if UNITY_STANDALONE_WIN
         _fullscreenModeDropdown.choices.Add(exclusiveFullscreen);
 #endif
-
         _fullscreenModeDropdown.choices.Add(fullscreenWindow);
-
 #if UNITY_STANDALONE_OSX
         _fullscreenModeDropdown.choices.Add(maximizedWindow);
 #endif
-
         _fullscreenModeDropdown.choices.Add(windowed);
 
         _fullscreenModeDropdown.RegisterValueChangedCallback(evt =>
