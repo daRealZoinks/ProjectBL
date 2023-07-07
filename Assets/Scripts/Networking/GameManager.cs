@@ -12,6 +12,7 @@ namespace Networking
         [SerializeField] private Transform ballSpawnPoint;
 
         [SerializeField] private NetworkObject artificialIntelligencePrefab;
+        [SerializeField] private bool automaticNumberOfArtificialIntelligences = false;
         [SerializeField] private int numberOfArtificialIntelligences = 1;
         [SerializeField] private List<Transform> artificialIntelligenceSpawnPoints;
 
@@ -44,10 +45,13 @@ namespace Networking
         private void Start()
         {
             if (!IsServer) return;
-        
+
             ballInstance = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity);
 
             ballInstance.Spawn();
+
+            if (automaticNumberOfArtificialIntelligences)
+                numberOfArtificialIntelligences = 6 - NetworkManager.Singleton.ConnectedClientsList.Count;
 
             for (var i = 0; i < numberOfArtificialIntelligences; i++)
             {
@@ -59,7 +63,7 @@ namespace Networking
                 var artificialIntelligence = artificialIntelligenceInstance.GetComponent<ArtificialIntelligence>();
 
                 var ballInstanceTransform = ballInstance.transform;
-            
+
                 artificialIntelligence.MoveTarget = ballInstanceTransform;
                 artificialIntelligence.LookTarget = ballInstanceTransform;
 
