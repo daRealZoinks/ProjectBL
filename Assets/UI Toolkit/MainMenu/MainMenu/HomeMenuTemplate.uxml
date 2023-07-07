@@ -1,17 +1,13 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
-    <ui:Template name="MainMenuTemplate"
-                 src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenu/MainMenuTemplate.uxml?fileID=9197481963319205126&amp;guid=09cddbf6516f6404ca2f6b72bda1e299&amp;type=3#MainMenuTemplate"/>
-    <ui:Template name="OptionsMenuTemplate"
-                 src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenu/OptionsMenuTemplate.uxml?fileID=9197481963319205126&amp;guid=38ae82270d950a64b93d44a9f42fca7f&amp;type=3#OptionsMenuTemplate"/>
-    <ui:Template name="GraphicsMenuTemplate"
-                 src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenu/GraphicsMenuTemplate.uxml?fileID=9197481963319205126&amp;guid=1c217ecd428e8aa47ae6a2fe0af9e182&amp;type=3#GraphicsMenuTemplate"/>
-    <ui:Template name="SoundMenuTemplate"
-                 src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenu/SoundMenuTemplate.uxml?fileID=9197481963319205126&amp;guid=612a0349785765c40bad684dea80aecf&amp;type=3#SoundMenuTemplate"/>
-    <Style src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenuStyleSheet.uss?fileID=7433441132597879392&amp;guid=f75bbf5d77e92354cb2637ddfac6e864&amp;type=3#MainMenuStyleSheet"/>
-    <ui:VisualElement style="flex-grow: 1; flex-direction: column-reverse; justify-content: flex-start;">
-        <ui:Instance template="MainMenuTemplate" name="main-menu" style="display: flex;"/>
-        <ui:Instance template="OptionsMenuTemplate" name="options-menu" style="display: none;"/>
-        <ui:Instance template="GraphicsMenuTemplate" name="graphics-menu" style="display: none;"/>
-        <ui:Instance template="SoundMenuTemplate" name="sound-menu" style="display: none;"/>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="MainMenuTemplate" src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenu/MainMenuTemplate.uxml?fileID=9197481963319205126&amp;guid=09cddbf6516f6404ca2f6b72bda1e299&amp;type=3#MainMenuTemplate" />
+    <ui:Template name="OptionsMenuTemplate" src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenu/OptionsMenuTemplate.uxml?fileID=9197481963319205126&amp;guid=38ae82270d950a64b93d44a9f42fca7f&amp;type=3#OptionsMenuTemplate" />
+    <ui:Template name="GraphicsMenuTemplate" src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenu/GraphicsMenuTemplate.uxml?fileID=9197481963319205126&amp;guid=1c217ecd428e8aa47ae6a2fe0af9e182&amp;type=3#GraphicsMenuTemplate" />
+    <ui:Template name="SoundMenuTemplate" src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenu/SoundMenuTemplate.uxml?fileID=9197481963319205126&amp;guid=612a0349785765c40bad684dea80aecf&amp;type=3#SoundMenuTemplate" />
+    <Style src="project://database/Assets/UI%20Toolkit/MainMenu/MainMenuStyleSheet.uss?fileID=7433441132597879392&amp;guid=f75bbf5d77e92354cb2637ddfac6e864&amp;type=3#MainMenuStyleSheet" />
+    <ui:VisualElement style="flex-grow: 1; flex-direction: column-reverse; justify-content: flex-start; background-color: rgb(19, 19, 19);">
+        <ui:Instance template="MainMenuTemplate" name="main-menu" style="display: flex;" />
+        <ui:Instance template="OptionsMenuTemplate" name="options-menu" style="display: none;" />
+        <ui:Instance template="GraphicsMenuTemplate" name="graphics-menu" style="display: none;" />
+        <ui:Instance template="SoundMenuTemplate" name="sound-menu" style="display: none;" />
     </ui:VisualElement>
 </ui:UXML>
