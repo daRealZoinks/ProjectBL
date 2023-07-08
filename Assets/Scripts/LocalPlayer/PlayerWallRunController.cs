@@ -12,32 +12,32 @@ namespace LocalPlayer
         [Tooltip("The distance at which the player character checks for walls to wall run on.")]
         [Range(0.1f, 2f)]
         [SerializeField]
-        private float wallCheckDistance = 0.75f;
+        private float wallCheckDistance = 0.75f; // m
 
         [Tooltip("The amount of time the player character has to wait before being able to wall run again.")]
         [SerializeField]
         [Range(0.1f, 1f)]
-        private float wallRunCooldown = 0.4f;
+        private float wallRunCooldown = 0.4f; // s
 
         [Space]
         [Header("Wall Run Settings")]
         [Tooltip("The height of the jump when the player jumps off a wall.")]
         [SerializeField]
-        private float wallJumpHeight = 3f;
+        private float wallJumpHeight = 3f; // m
 
         [Tooltip("The amount of forward impulse applied to the player character when starting a wall run.")]
         [SerializeField]
-        private float wallRunInitialImpulse = 4f;
+        private float wallRunInitialImpulse = 4f; // m/s
 
         [Space]
         [Header("Wall Jump Settings")]
         [Tooltip("The amount of force applied to the player character when jumping off a wall to the side.")]
         [SerializeField]
-        private float wallJumpSideForce = 7f;
+        private float wallJumpSideForce = 7f; // m/s
 
         [Tooltip("The amount of forward force applied to the player character when jumping off a wall.")]
         [SerializeField]
-        private float wallJumpForwardForce = 4f;
+        private float wallJumpForwardForce = 4f; // m/s
 
         private PlayerCharacterController _playerCharacterController;
 
@@ -75,6 +75,9 @@ namespace LocalPlayer
             OnWallJump += WallJumpAsync;
         }
 
+        /// <summary>
+        ///     Makes the player character jump off the wall.
+        /// </summary>
         public void WallJump()
         {
             if (IsWallRunning && _canWallJump) OnWallJump?.Invoke();

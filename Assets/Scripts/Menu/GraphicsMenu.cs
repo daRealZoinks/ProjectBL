@@ -59,10 +59,8 @@ public class GraphicsMenu : MonoBehaviour
     private Settings ReadSettings()
     {
         Settings settings = new();
-        string filePath;
-#if UNITY_STANDALONE_WIN
-        filePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-                   "/My Games/ProjectBL/graphics.xml";
+        var filePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
+           "/My Games/ProjectBL/graphics.xml";
         XmlSerializer serializer = new(typeof(Settings));
 
         if (File.Exists(filePath))
@@ -80,7 +78,7 @@ public class GraphicsMenu : MonoBehaviour
 
             SaveSettings();
         }
-#endif
+
         return settings;
     }
 
@@ -93,7 +91,7 @@ public class GraphicsMenu : MonoBehaviour
     private void SaveSettings()
     {
         string filePath;
-#if UNITY_STANDALONE_WIN
+
         filePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/My Games/ProjectBL/";
         XmlSerializer serializer = new(typeof(Settings));
 
@@ -103,7 +101,6 @@ public class GraphicsMenu : MonoBehaviour
         {
             serializer.Serialize(writer, _settings);
         }
-#endif
     }
 
     private void InitializeFullscreenModeDropdown()

@@ -27,6 +27,10 @@ namespace LocalPlayer
         [SerializeField]
         private float jumpHeight = 3f; // m
 
+        [Tooltip("The amount of time the player has to wait before being able to jump again in s")]
+        [SerializeField]
+        private float jumpCooldown = 0.4f; // s
+
         [Tooltip("The amount of control the player has in the air")]
         [SerializeField]
         [Range(0, 1f)]
@@ -124,6 +128,9 @@ namespace LocalPlayer
             if (_floatingEnabled) Floating();
         }
 
+        /// <summary>
+        ///     Makes the player jump.
+        /// </summary>
         public void Jump()
         {
             if (IsGrounded && _canJump) OnJump?.Invoke();
@@ -217,7 +224,7 @@ namespace LocalPlayer
             var jumpForce = Vector3.up * Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
             _rigidbody.AddForce(jumpForce, ForceMode.VelocityChange);
 
-            await Task.Delay(TimeSpan.FromSeconds(0.4f));
+            await Task.Delay(TimeSpan.FromSeconds(jumpCooldown));
 
             _floatingEnabled = true;
             _canJump = true;

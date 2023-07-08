@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using LocalPlayer;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace Networking
 {
+    [RequireComponent(typeof(CountdownTimer))]
     public class GameManager : NetworkBehaviour
     {
         [SerializeField] private NetworkObject ballPrefab;
@@ -21,8 +24,13 @@ namespace Networking
 
         [SerializeField] private List<ArtificialIntelligence> artificialIntelligences = new();
 
-        private readonly NetworkVariable<int> _blueScore = new(writePerm: NetworkVariableWritePermission.Server);
-        private readonly NetworkVariable<int> _orangeScore = new(writePerm: NetworkVariableWritePermission.Server);
+        private readonly NetworkVariable<int> _blueScore = new();
+        private readonly NetworkVariable<int> _orangeScore = new();
+
+        private CountdownTimer _countdownTimer;
+
+        private readonly NetworkVariable<int> _minutes = new();
+        private readonly NetworkVariable<int> _seconds = new();
 
         /// <summary>
         ///     The score of the blue team.
@@ -44,6 +52,8 @@ namespace Networking
 
         private void Start()
         {
+            _countdownTimer = GetComponent<CountdownTimer>();
+
             if (!IsServer) return;
 
             ballInstance = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity);
@@ -69,18 +79,38 @@ namespace Networking
 
                 artificialIntelligences.Add(artificialIntelligence);
             }
+
+            _countdownTimer.Resume();
+            _countdownTimer.OnTimerExpired += OnTimerExpired;
+        }
+
+        private void OnTimerExpired()
+        {
+            Debug.Log("Timer expired!");
+            // destroy ball 
+            ballInstance.Despawn();
         }
 
         private void OnEnable()
         {
-            blueGoalPosts.OnGoal += OnBlueGoal;
-            orangeGoalPosts.OnGoal += OnOrangeGoal;
+            blueGoalPosts.OnGoal += OnBlueGoalAsync;
+            orangeGoalPosts.OnGoal += OnOrangeGoalAsync;
         }
 
         private void OnDisable()
         {
-            blueGoalPosts.OnGoal -= OnBlueGoal;
-            orangeGoalPosts.OnGoal -= OnOrangeGoal;
+            blueGoalPosts.OnGoal -= OnBlueGoalAsync;
+            orangeGoalPosts.OnGoal -= OnOrangeGoalAsync;
+        }
+
+        private void Update()
+        {
+            if (!IsServer) return;
+
+            _countdownTimer.Tick(Time.deltaTime);
+
+            _minutes.Value = _countdownTimer.Minutes;
+            _seconds.Value = _countdownTimer.Seconds;
         }
 
         private void OnGUI()
@@ -88,17 +118,51 @@ namespace Networking
             GUILayout.BeginArea(new Rect(10, 10, 200, 200));
             GUILayout.Label($"Blue: {BlueScore}");
             GUILayout.Label($"Orange: {OrangeScore}");
+            GUILayout.Label($"{_countdownTimer.Minutes:00}:{_countdownTimer.Seconds:00}");
+            if (_countdownTimer.IsPaused) GUILayout.Label("Paused");
             GUILayout.EndArea();
         }
 
-        private void OnBlueGoal()
+        private async void OnBlueGoalAsync()
         {
-            if (IsServer) OrangeScore++;
+            if (!IsServer) return;
+
+            OrangeScore++;
+
+            await ResetBallAsync();
         }
 
-        private void OnOrangeGoal()
+        private async void OnOrangeGoalAsync()
         {
-            if (IsServer) BlueScore++;
+            if (!IsServer) return;
+
+            BlueScore++;
+
+            await ResetBallAsync();
+        }
+
+        private async Task ResetBallAsync()
+        {
+            // Pause the timer
+            _countdownTimer.Pause();
+
+            // Disable the ball
+            ballInstance.gameObject.SetActive(false);
+
+            // Wait for 3 seconds
+            await Task.Delay(TimeSpan.FromSeconds(3f));
+
+            // Reset the ball
+            ballInstance.transform.position = ballSpawnPoint.position;
+            ballInstance.transform.rotation = Quaternion.identity;
+            ballInstance.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            ballInstance.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+
+            // Enable the ball
+            ballInstance.gameObject.SetActive(true);
+
+            // Unpause the timer
+            _countdownTimer.Resume();
         }
     }
 }
