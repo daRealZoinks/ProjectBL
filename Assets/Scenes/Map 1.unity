@@ -1471,8 +1471,8 @@ MonoBehaviour:
   ballSpawnPoint: {fileID: 1601310185}
   artificialIntelligencePrefab: {fileID: 7169626300012054847, guid: 8edbc3cd8ac53584196606143d88942f,
     type: 3}
-  automaticNumberOfArtificialIntelligences: 1
-  numberOfArtificialIntelligences: 1
+  automaticNumberOfArtificialIntelligences: 0
+  numberOfArtificialIntelligences: 0
   artificialIntelligenceSpawnPoints:
   - {fileID: 931616115}
   - {fileID: 276170382}

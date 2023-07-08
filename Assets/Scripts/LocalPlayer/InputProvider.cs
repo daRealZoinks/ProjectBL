@@ -7,11 +7,13 @@ namespace LocalPlayer
     [RequireComponent(typeof(PlayerWallRunController))]
     public class InputProvider : MonoBehaviour
     {
-        [Tooltip("The player camera controller")] [SerializeField]
+        [Tooltip("The player camera controller")]
+        [SerializeField]
         private PlayerCameraController playerCameraController;
 
-        [Tooltip("The melee attack")] [SerializeField]
-        private MeleeAttack meleeAttack;
+        [Tooltip("The melee attack")]
+        [SerializeField]
+        private MeleeKick meleeKick;
 
         private PlayerCharacterController _playerCharacterController;
         private PlayerWallRunController _playerWallRunController;
@@ -90,7 +92,7 @@ namespace LocalPlayer
         /// <param name="context"> The melee input context </param>
         public void OnMelee(InputAction.CallbackContext context)
         {
-            if (context.phase == InputActionPhase.Started) meleeAttack.Attack();
+            if (context.phase == InputActionPhase.Started) meleeKick.Attack();
         }
     }
 }

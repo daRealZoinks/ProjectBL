@@ -497,12 +497,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 706b672f4be255a499575d4cee718dc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallJumpHeight: 3
-  wallJumpSideForce: 8
-  wallJumpForwardForce: 8
-  wallRunForwardImpulse: 8
   wallCheckDistance: 0.75
   wallRunCooldown: 0.4
+  wallJumpHeight: 3
+  wallRunInitialImpulse: 4
+  wallJumpSideForce: 5
+  wallJumpForwardForce: 4
 --- !u!114 &8135219768289751768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -516,7 +516,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCameraController: {fileID: 5571163948937526567}
-  meleeAttack: {fileID: 142767125561270786}
+  meleeKick: {fileID: 142767125561270786}
 --- !u!82 &5057796971305018253
 AudioSource:
   m_ObjectHideFlags: 0
@@ -783,9 +783,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2357d895fc44ffd41afd47aff1b7b184, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRange: 3
-  attackRadius: 0.75
-  attackForce: 250
+  playerRigidbody: {fileID: 5753339366875455905}
+  kickRange: 1
+  kickRadius: 0.75
+  kickForce: 1500
 --- !u!1001 &6613184410001889587
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -16401,12 +16401,12 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1773088148}
-    PlayerPrefab: {fileID: 7536299176113935708, guid: ddcd94fddf96031488fca3dd9dc25db8,
+    PlayerPrefab: {fileID: 7536299176113935708, guid: 1ef2f225ec21a8d48a61bc63168a3b73,
       type: 3}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: 18ea5e5d51c9cf646b505be81f1d1348, type: 2}
-    TickRate: 120
+    TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
     ConnectionData: 
@@ -16459,9 +16459,9 @@ MonoBehaviour:
   m_MaxConnectAttempts: 60
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
-    Address: localhost
+    Address: 127.0.0.1
     Port: 7777
-    ServerListenAddress: 127.0.0.1
+    ServerListenAddress: 0.0.0.0
   DebugSimulator:
     PacketDelayMS: 0
     PacketJitterMS: 0

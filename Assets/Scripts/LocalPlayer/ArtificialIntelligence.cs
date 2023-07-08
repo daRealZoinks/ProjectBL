@@ -4,11 +4,13 @@ namespace LocalPlayer
 {
     public class ArtificialIntelligence : MonoBehaviour
     {
-        [Tooltip("The player camera controller to use for looking at the target.")] [SerializeField]
+        [Tooltip("The player camera controller to use for looking at the target.")]
+        [SerializeField]
         private PlayerCameraController playerCameraController;
 
-        [Tooltip("The melee attack to use when the target is close enough.")] [SerializeField]
-        private MeleeAttack meleeAttack;
+        [Tooltip("The melee attack to use when the target is close enough.")]
+        [SerializeField]
+        private MeleeKick meleeKick;
 
         private PlayerCharacterController _playerCharacterController;
 
@@ -40,7 +42,7 @@ namespace LocalPlayer
 
             var distanceFromCharacterToTarget =
                 (_playerCharacterController.transform.position - targetPosition).magnitude;
-            if (distanceFromCharacterToTarget < meleeAttack.AttackRange) meleeAttack.Attack();
+            if (distanceFromCharacterToTarget < meleeKick.KickRange) meleeKick.Attack();
         }
 
         private Vector2 MoveTowards(Vector3 target)

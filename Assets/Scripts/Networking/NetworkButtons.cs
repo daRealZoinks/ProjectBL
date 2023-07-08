@@ -7,14 +7,18 @@ namespace Networking
     public class NetworkButtons : MonoBehaviour
     {
         [SerializeField] private CursorController cursorController;
+        private UnityTransport unityTransport;
+
+        private void Start()
+        {
+            unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        }
 
         private void OnGUI()
         {
             GUILayout.BeginArea(new Rect(10, 10, 300, 300));
 
             var networkManager = NetworkManager.Singleton;
-
-            var unityTransport = (UnityTransport)networkManager.NetworkConfig.NetworkTransport;
 
             if (!networkManager.IsClient && !networkManager.IsServer)
             {
@@ -31,21 +35,20 @@ namespace Networking
                 if (GUILayout.Button("Host"))
                 {
                     networkManager.StartHost();
-                    cursorController.HideCursor = true;
                 }
 
                 if (GUILayout.Button("Client"))
                 {
                     networkManager.StartClient();
-                    cursorController.HideCursor = true;
                 }
 
                 if (GUILayout.Button("Server"))
                 {
                     networkManager.StartServer();
-                    cursorController.HideCursor = true;
                 }
             }
+
+            cursorController.HideCursor = networkManager.IsClient || networkManager.IsServer || networkManager.IsHost;
 
             GUILayout.EndArea();
         }

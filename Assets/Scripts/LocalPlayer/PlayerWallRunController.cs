@@ -9,22 +9,6 @@ namespace LocalPlayer
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerWallRunController : MonoBehaviour
     {
-        [Tooltip("The height of the jump when the player jumps off a wall.")]
-        [SerializeField]
-        private float wallJumpHeight = 3f;
-
-        [Tooltip("The amount of force applied to the player character when jumping off a wall to the side.")]
-        [SerializeField]
-        private float wallJumpSideForce = 8f;
-
-        [Tooltip("The amount of forward force applied to the player character when jumping off a wall.")]
-        [SerializeField]
-        private float wallJumpForwardForce = 8f;
-
-        [Tooltip("The amount of forward impulse applied to the player character when starting a wall run.")]
-        [SerializeField]
-        private float wallRunForwardImpulse = 8f;
-
         [Tooltip("The distance at which the player character checks for walls to wall run on.")]
         [Range(0.1f, 2f)]
         [SerializeField]
@@ -34,6 +18,26 @@ namespace LocalPlayer
         [SerializeField]
         [Range(0.1f, 1f)]
         private float wallRunCooldown = 0.4f;
+
+        [Space]
+        [Header("Wall Run Settings")]
+        [Tooltip("The height of the jump when the player jumps off a wall.")]
+        [SerializeField]
+        private float wallJumpHeight = 3f;
+
+        [Tooltip("The amount of forward impulse applied to the player character when starting a wall run.")]
+        [SerializeField]
+        private float wallRunInitialImpulse = 4f;
+
+        [Space]
+        [Header("Wall Jump Settings")]
+        [Tooltip("The amount of force applied to the player character when jumping off a wall to the side.")]
+        [SerializeField]
+        private float wallJumpSideForce = 7f;
+
+        [Tooltip("The amount of forward force applied to the player character when jumping off a wall.")]
+        [SerializeField]
+        private float wallJumpForwardForce = 4f;
 
         private PlayerCharacterController _playerCharacterController;
 
@@ -112,19 +116,24 @@ namespace LocalPlayer
                 IsWallLeft = Physics.Raycast(leftRay, out _leftHitInfo, wallCheckDistance,
                     _playerCharacterController.GroundLayerMask);
 
+
+            Vector3 boostForce = Vector3.zero;
+
+            var velocity = _playerCharacterController.Velocity;
+
+            // take into account the direction the player is sliding along the wall
             if (IsWallRight && !wasWallRight)
             {
-                var forwardForce = -Vector3.Cross(_rightHitInfo.normal, transform.up) * wallRunForwardImpulse;
-
-                _rigidbody.AddForce(forwardForce, ForceMode.VelocityChange);
+                boostForce = -Vector3.Cross(_rightHitInfo.normal, transform.up) * wallRunInitialImpulse;
             }
 
             if (IsWallLeft && !wasWallLeft)
             {
-                var forwardForce = Vector3.Cross(_leftHitInfo.normal, transform.up) * wallRunForwardImpulse;
-
-                _rigidbody.AddForce(forwardForce, ForceMode.VelocityChange);
+                boostForce = Vector3.Cross(_leftHitInfo.normal, transform.up) * wallRunInitialImpulse;
             }
+
+            _rigidbody.AddForce(boostForce, ForceMode.VelocityChange);
+
 
             if (IsWallRight) _rigidbody.AddForce(-_rightHitInfo.normal, ForceMode.Acceleration);
             if (IsWallLeft) _rigidbody.AddForce(-_leftHitInfo.normal, ForceMode.Acceleration);

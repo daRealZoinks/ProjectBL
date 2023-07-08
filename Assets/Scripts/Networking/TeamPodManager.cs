@@ -24,14 +24,9 @@ public class TeamPodManager : MonoBehaviour
 
         foreach (var pod in pods) if (pod.IsReady) numberOfPodsReady++;
 
-
-        if ((networkManager.IsServer && networkManager.ConnectedClientsList.Count > 1)
-        || (networkManager.IsHost && networkManager.ConnectedClientsList.Count > 0))
-        {
-            if (numberOfPodsReady == networkManager.ConnectedClientsList.Count)
-                networkManager.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
-        }
-
+        if (networkManager.ConnectedClientsList.Count > 0 &&
+        numberOfPodsReady == networkManager.ConnectedClientsList.Count)
+            networkManager.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
     }
 
 #if UNITY_EDITOR
