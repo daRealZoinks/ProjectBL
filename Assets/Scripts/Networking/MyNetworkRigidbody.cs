@@ -14,12 +14,14 @@ namespace Networking
         private readonly NetworkVariable<Vector3> _networkAngularVelocity =
             new(writePerm: NetworkVariableWritePermission.Owner);
 
-        private readonly NetworkVariable<Vector3> _networkPosition = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> _networkPosition =
+            new(writePerm: NetworkVariableWritePermission.Owner);
 
         private readonly NetworkVariable<Quaternion>
             _networkRotation = new(writePerm: NetworkVariableWritePermission.Owner);
 
-        private readonly NetworkVariable<Vector3> _networkVelocity = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> _networkVelocity =
+            new(writePerm: NetworkVariableWritePermission.Owner);
 
         private float _angle;
         private float _distance;

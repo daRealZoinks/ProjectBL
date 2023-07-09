@@ -4,7 +4,8 @@ namespace LocalPlayer
 {
     public class LateralTiltController : MonoBehaviour
     {
-        [SerializeField] private bool lateralTiltEnabled = true;
+        [Tooltip("Whether or not the lateral tilt is enabled")] [SerializeField]
+        private bool lateralTiltEnabled = true;
 
         [Header("Tilt")] [Tooltip("The angle of tilt when the player is moving")] [SerializeField] [Range(0, 10f)]
         private float angle = 2f;
@@ -15,11 +16,11 @@ namespace LocalPlayer
         [Tooltip("The speed of the tilt when the player is moving")] [SerializeField] [Range(0, 15f)]
         private float speed = 5f;
 
-        [Tooltip("The player character controller")]
-        [SerializeField] private PlayerCharacterController playerCharacterController;
+        [Tooltip("The player character controller")] [SerializeField]
+        private PlayerCharacterController playerCharacterController;
 
-        [Tooltip("The player wall run controller")]
-        [SerializeField] private PlayerWallRunController playerWallRunController;
+        [Tooltip("The player wall run controller")] [SerializeField]
+        private PlayerWallRunController playerWallRunController;
 
         private Vector3 _startRotation;
 

@@ -1,24 +1,28 @@
 using UnityEngine;
 
-public class CursorController : MonoBehaviour
+namespace LocalPlayer
 {
-    [Tooltip("Hide the cursor when the game starts")]
-    [SerializeField]
-    private bool hideCursor = true;
-
-    public bool HideCursor
+    public class CursorController : MonoBehaviour
     {
-        get => hideCursor;
-        set
+        [Tooltip("Hide the cursor when the game starts")] [SerializeField]
+        private bool hideCursor = true;
+
+        /// <summary>
+        ///     Hide the cursor
+        /// </summary>
+        public bool HideCursor
         {
-            hideCursor = value;
-            Cursor.lockState = hideCursor ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = !hideCursor;
+            set
+            {
+                hideCursor = value;
+                Cursor.lockState = hideCursor ? CursorLockMode.Locked : CursorLockMode.None;
+                Cursor.visible = !hideCursor;
+            }
         }
-    }
 
-    private void Start()
-    {
-        HideCursor = hideCursor;
+        private void Start()
+        {
+            HideCursor = hideCursor;
+        }
     }
 }

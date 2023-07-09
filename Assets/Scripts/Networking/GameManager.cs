@@ -15,7 +15,7 @@ namespace Networking
         [SerializeField] private Transform ballSpawnPoint;
 
         [SerializeField] private NetworkObject artificialIntelligencePrefab;
-        [SerializeField] private bool automaticNumberOfArtificialIntelligences = false;
+        [SerializeField] private bool automaticNumberOfArtificialIntelligences;
         [SerializeField] private int numberOfArtificialIntelligences = 1;
         [SerializeField] private List<Transform> artificialIntelligenceSpawnPoints;
 
@@ -25,12 +25,12 @@ namespace Networking
         [SerializeField] private List<ArtificialIntelligence> artificialIntelligences = new();
 
         private readonly NetworkVariable<int> _blueScore = new();
-        private readonly NetworkVariable<int> _orangeScore = new();
-
-        private CountdownTimer _countdownTimer;
 
         private readonly NetworkVariable<int> _minutes = new();
+        private readonly NetworkVariable<int> _orangeScore = new();
         private readonly NetworkVariable<int> _seconds = new();
+
+        private CountdownTimer _countdownTimer;
 
         /// <summary>
         ///     The score of the blue team.
@@ -84,11 +84,14 @@ namespace Networking
             _countdownTimer.OnTimerExpired += OnTimerExpired;
         }
 
-        private void OnTimerExpired()
+        private void Update()
         {
-            Debug.Log("Timer expired!");
-            // destroy ball 
-            ballInstance.Despawn();
+            if (!IsServer) return;
+
+            _countdownTimer.Tick(Time.deltaTime);
+
+            _minutes.Value = _countdownTimer.Minutes;
+            _seconds.Value = _countdownTimer.Seconds;
         }
 
         private void OnEnable()
@@ -103,16 +106,6 @@ namespace Networking
             orangeGoalPosts.OnGoal -= OnOrangeGoalAsync;
         }
 
-        private void Update()
-        {
-            if (!IsServer) return;
-
-            _countdownTimer.Tick(Time.deltaTime);
-
-            _minutes.Value = _countdownTimer.Minutes;
-            _seconds.Value = _countdownTimer.Seconds;
-        }
-
         private void OnGUI()
         {
             GUILayout.BeginArea(new Rect(10, 10, 200, 200));
@@ -121,6 +114,13 @@ namespace Networking
             GUILayout.Label($"{_countdownTimer.Minutes:00}:{_countdownTimer.Seconds:00}");
             if (_countdownTimer.IsPaused) GUILayout.Label("Paused");
             GUILayout.EndArea();
+        }
+
+        private void OnTimerExpired()
+        {
+            Debug.Log("Timer expired!");
+            // destroy ball 
+            ballInstance.Despawn();
         }
 
         private async void OnBlueGoalAsync()
@@ -153,8 +153,10 @@ namespace Networking
             await Task.Delay(TimeSpan.FromSeconds(3f));
 
             // Reset the ball
-            ballInstance.transform.position = ballSpawnPoint.position;
-            ballInstance.transform.rotation = Quaternion.identity;
+            var ballInstanceTransform = ballInstance.transform;
+            ballInstanceTransform.position = ballSpawnPoint.position;
+            ballInstanceTransform.rotation = Quaternion.identity;
+            
             ballInstance.GetComponent<Rigidbody>().velocity = Vector3.zero;
             ballInstance.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 

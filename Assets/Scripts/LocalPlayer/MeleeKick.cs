@@ -1,27 +1,19 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace LocalPlayer
 {
     public class MeleeKick : MonoBehaviour
     {
-        [Tooltip("The player rigidbody.")]
-        [SerializeField]
+        [Tooltip("The player rigidbody.")] [SerializeField]
         private Rigidbody playerRigidbody;
 
-        [Tooltip("The range of the kick.")]
-        [SerializeField]
-        [Range(0, 3f)]
+        [Tooltip("The range of the kick.")] [SerializeField] [Range(0, 3f)]
         private float kickRange = 1f;
 
-        [Tooltip("The radius of the kick.")]
-        [SerializeField]
-        [Range(0, 1f)]
+        [Tooltip("The radius of the kick.")] [SerializeField] [Range(0, 1f)]
         private float kickRadius = 0.75f;
 
-        [Tooltip("The force of the kick.")]
-        [SerializeField]
-        [Range(0, 2000f)]
+        [Tooltip("The force of the kick.")] [SerializeField] [Range(0, 2000f)]
         private float kickForce = 1500f;
 
         /// <summary>

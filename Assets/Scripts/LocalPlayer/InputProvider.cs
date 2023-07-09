@@ -7,12 +7,10 @@ namespace LocalPlayer
     [RequireComponent(typeof(PlayerWallRunController))]
     public class InputProvider : MonoBehaviour
     {
-        [Tooltip("The player camera controller")]
-        [SerializeField]
+        [Tooltip("The player camera controller")] [SerializeField]
         private PlayerCameraController playerCameraController;
 
-        [Tooltip("The melee attack")]
-        [SerializeField]
+        [Tooltip("The melee attack")] [SerializeField]
         private MeleeKick meleeKick;
 
         private PlayerCharacterController _playerCharacterController;
@@ -60,18 +58,7 @@ namespace LocalPlayer
         /// <param name="context"> The fire input context </param>
         public void OnFire(InputAction.CallbackContext context)
         {
-            switch (context.phase)
-            {
-                case InputActionPhase.Started:
-                    // TODO: Fire
-                    break;
-                case InputActionPhase.Performed:
-                    // nothing
-                    break;
-                case InputActionPhase.Canceled:
-                    // nothing
-                    break;
-            }
+            if (context.phase == InputActionPhase.Started) Debug.Log("Fire"); 
         }
 
         /// <summary>

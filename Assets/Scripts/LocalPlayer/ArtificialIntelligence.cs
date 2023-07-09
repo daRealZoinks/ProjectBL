@@ -4,12 +4,10 @@ namespace LocalPlayer
 {
     public class ArtificialIntelligence : MonoBehaviour
     {
-        [Tooltip("The player camera controller to use for looking at the target.")]
-        [SerializeField]
+        [Tooltip("The player camera controller to use for looking at the target.")] [SerializeField]
         private PlayerCameraController playerCameraController;
 
-        [Tooltip("The melee attack to use when the target is close enough.")]
-        [SerializeField]
+        [Tooltip("The melee attack to use when the target is close enough.")] [SerializeField]
         private MeleeKick meleeKick;
 
         private PlayerCharacterController _playerCharacterController;

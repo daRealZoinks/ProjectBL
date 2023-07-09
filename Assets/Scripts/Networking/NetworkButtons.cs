@@ -1,3 +1,4 @@
+using LocalPlayer;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
@@ -7,11 +8,12 @@ namespace Networking
     public class NetworkButtons : MonoBehaviour
     {
         [SerializeField] private CursorController cursorController;
-        private UnityTransport unityTransport;
+        
+        private UnityTransport _unityTransport;
 
         private void Start()
         {
-            unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+            _unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         }
 
         private void OnGUI()
@@ -24,28 +26,20 @@ namespace Networking
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("IP Address");
-                unityTransport.ConnectionData.Address = GUILayout.TextField(unityTransport.ConnectionData.Address);
+                _unityTransport.ConnectionData.Address = GUILayout.TextField(_unityTransport.ConnectionData.Address);
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Port");
-                unityTransport.ConnectionData.Port = ushort.Parse(GUILayout.TextField(unityTransport.ConnectionData.Port.ToString()));
+                _unityTransport.ConnectionData.Port =
+                    ushort.Parse(GUILayout.TextField(_unityTransport.ConnectionData.Port.ToString()));
                 GUILayout.EndHorizontal();
 
-                if (GUILayout.Button("Host"))
-                {
-                    networkManager.StartHost();
-                }
+                if (GUILayout.Button("Host")) networkManager.StartHost();
 
-                if (GUILayout.Button("Client"))
-                {
-                    networkManager.StartClient();
-                }
+                if (GUILayout.Button("Client")) networkManager.StartClient();
 
-                if (GUILayout.Button("Server"))
-                {
-                    networkManager.StartServer();
-                }
+                if (GUILayout.Button("Server")) networkManager.StartServer();
             }
 
             cursorController.HideCursor = networkManager.IsClient || networkManager.IsServer || networkManager.IsHost;

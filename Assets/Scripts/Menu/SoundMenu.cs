@@ -1,45 +1,44 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class SoundMenu : MonoBehaviour
+namespace Menu
 {
-    private Button _backButton;
-
-
-    private Slider _masterVolumeSlider;
-    private Slider _musicVolumeSlider;
-    private VisualElement _optionsMenu;
-    private VisualElement _root;
-    private Slider _sfxVolumeSlider;
-    private VisualElement _soundMenu;
-
-    private void Awake()
+    public class SoundMenu : MonoBehaviour
     {
-        _root = GetComponent<UIDocument>().rootVisualElement;
+        private Button _backButton;
 
-        _optionsMenu = _root.Q<VisualElement>("options-menu");
-        _soundMenu = _root.Q<VisualElement>("sound-menu");
+        private Slider _masterVolumeSlider;
+        private Slider _musicVolumeSlider;
+        private VisualElement _optionsMenu;
+        private Slider _sfxVolumeSlider;
+        private VisualElement _soundMenu;
 
-        _backButton = _root.Q<Button>("sound-menu-back-button");
-        _backButton.clicked += () =>
+        private void Awake()
         {
-            _optionsMenu.style.display = DisplayStyle.Flex;
-            _soundMenu.style.display = DisplayStyle.None;
-        };
+            var root = GetComponent<UIDocument>().rootVisualElement;
 
-        // InitializeSoundSliders();
-    }
+            _optionsMenu = root.Q<VisualElement>("options-menu");
+            _soundMenu = root.Q<VisualElement>("sound-menu");
 
-    private void InitializeSoundSliders()
-    {
-        _masterVolumeSlider = _root.Q<Slider>("master-volume-slider");
-        _musicVolumeSlider = _root.Q<Slider>("music-volume-slider");
-        _sfxVolumeSlider = _root.Q<Slider>("sfx-volume-slider");
+            _masterVolumeSlider = root.Q<Slider>("master-volume-slider");
+            _musicVolumeSlider = root.Q<Slider>("music-volume-slider");
+            _sfxVolumeSlider = root.Q<Slider>("sfx-volume-slider");
+            
+            _backButton = root.Q<Button>("sound-menu-back-button");
+            _backButton.clicked += () =>
+            {
+                _optionsMenu.style.display = DisplayStyle.Flex;
+                _soundMenu.style.display = DisplayStyle.None;
+            };
 
-        _masterVolumeSlider.RegisterValueChangedCallback(evt => { Debug.Log(evt.newValue); });
+            InitializeSoundSliders();
+        }
 
-        _musicVolumeSlider.RegisterValueChangedCallback(evt => { Debug.Log(evt.newValue); });
-
-        _sfxVolumeSlider.RegisterValueChangedCallback(evt => { Debug.Log(evt.newValue); });
+        private void InitializeSoundSliders()
+        {
+            _masterVolumeSlider.RegisterValueChangedCallback(evt => { Debug.Log(evt.newValue); });
+            _musicVolumeSlider.RegisterValueChangedCallback(evt => { Debug.Log(evt.newValue); });
+            _sfxVolumeSlider.RegisterValueChangedCallback(evt => { Debug.Log(evt.newValue); });
+        }
     }
 }

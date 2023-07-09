@@ -1,69 +1,79 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class NetworkPlayer : NetworkBehaviour
+namespace Networking
 {
-    [SerializeField] private float _interpolationFactor = 0.1f;
-
-    private NetworkVariable<PlayerState> _playerState = new();
-
-    private Rigidbody _rigidbody;
-
-    private void Awake()
+    public class NetworkPlayer : NetworkBehaviour
     {
-        _rigidbody = GetComponent<Rigidbody>();
-    }
+        [SerializeField] private float interpolationFactor = 0.1f;
 
-    private void Update()
-    {
-        if (IsOwner) TransmitState();
-        else ConsumeState();
-    }
+        private Vector3 _lastAngularVelocity;
+        private Vector3 _lastPosition;
+        private Vector3 _lastVelocity;
 
-    private void TransmitState()
-    {
-        PlayerState playerState = new()
+        private readonly NetworkVariable<PlayerState> _playerState = new();
+
+        private Rigidbody _rigidbody;
+
+        private void Awake()
         {
-            Position = transform.position,
-            Rotation = transform.rotation,
-            Velocity = _rigidbody.velocity,
-            AngularVelocity = _rigidbody.angularVelocity
-        };
+            _rigidbody = GetComponent<Rigidbody>();
+        }
 
-        TransmitStateServerRpc(playerState);
-    }
-
-    [ServerRpc]
-    private void TransmitStateServerRpc(PlayerState playerState)
-    {
-        _playerState.Value = playerState;
-    }
-
-    private Vector3 _lastPosition;
-    private Vector3 _lastVelocity;
-    private Vector3 _lastAngularVelocity;
-
-    private void ConsumeState()
-    {
-        transform.position = Vector3.SmoothDamp(transform.position, _playerState.Value.Position, ref _lastPosition, _interpolationFactor);
-        transform.rotation = Quaternion.Slerp(transform.rotation, _playerState.Value.Rotation, _interpolationFactor);
-        _rigidbody.velocity = Vector3.SmoothDamp(_rigidbody.velocity, _playerState.Value.Velocity, ref _lastVelocity, _interpolationFactor);
-        _rigidbody.angularVelocity = Vector3.SmoothDamp(_rigidbody.angularVelocity, _playerState.Value.AngularVelocity, ref _lastAngularVelocity, _interpolationFactor);
-    }
-
-    private struct PlayerState : INetworkSerializable
-    {
-        public Vector3 Position;
-        public Quaternion Rotation;
-        public Vector3 Velocity;
-        public Vector3 AngularVelocity;
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        private void Update()
         {
-            serializer.SerializeValue(ref Position);
-            serializer.SerializeValue(ref Rotation);
-            serializer.SerializeValue(ref Velocity);
-            serializer.SerializeValue(ref AngularVelocity);
+            if (IsOwner) TransmitState();
+            else ConsumeState();
+        }
+
+        private void TransmitState()
+        {
+            var playerTransform = transform;
+            
+            PlayerState playerState = new()
+            {
+                Position = playerTransform.position,
+                Rotation = playerTransform.rotation,
+                Velocity = _rigidbody.velocity,
+                AngularVelocity = _rigidbody.angularVelocity
+            };
+
+            TransmitStateServerRpc(playerState);
+        }
+
+        [ServerRpc]
+        private void TransmitStateServerRpc(PlayerState playerState)
+        {
+            _playerState.Value = playerState;
+        }
+
+        private void ConsumeState()
+        {
+            var playerTransform = transform;
+            
+            playerTransform.position = Vector3.SmoothDamp(playerTransform.position, _playerState.Value.Position, ref _lastPosition,
+                interpolationFactor);
+            transform.rotation = Quaternion.Slerp(playerTransform.rotation, _playerState.Value.Rotation, interpolationFactor);
+            _rigidbody.velocity = Vector3.SmoothDamp(_rigidbody.velocity, _playerState.Value.Velocity, ref _lastVelocity,
+                interpolationFactor);
+            _rigidbody.angularVelocity = Vector3.SmoothDamp(_rigidbody.angularVelocity, _playerState.Value.AngularVelocity,
+                ref _lastAngularVelocity, interpolationFactor);
+        }
+
+        private struct PlayerState : INetworkSerializable
+        {
+            public Vector3 Position;
+            public Quaternion Rotation;
+            public Vector3 Velocity;
+            public Vector3 AngularVelocity;
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref Position);
+                serializer.SerializeValue(ref Rotation);
+                serializer.SerializeValue(ref Velocity);
+                serializer.SerializeValue(ref AngularVelocity);
+            }
         }
     }
 }

@@ -4,23 +4,16 @@ namespace LocalPlayer
 {
     public class PlayerCameraController : MonoBehaviour
     {
-        [Header("Camera")]
-        [Tooltip("The sensitivity of the camera")]
-        [SerializeField]
+        [Header("Camera")] [Tooltip("The sensitivity of the camera")] [SerializeField]
         private float sensitivity = 0.1f;
 
-        [Tooltip("The virtual camera")]
-        [SerializeField]
+        [Tooltip("The virtual camera")] [SerializeField]
         private PlayerCharacterController playerCharacterController;
 
-        [Space]
-        [Header("Camera Rotation Constraints")]
-        [Tooltip("The minimum angle of the camera")]
-        [SerializeField]
+        [Space] [Header("Camera Rotation Constraints")] [Tooltip("The minimum angle of the camera")] [SerializeField]
         private float minimumAngle = -90f;
 
-        [Tooltip("The maximum angle of the camera")]
-        [SerializeField]
+        [Tooltip("The maximum angle of the camera")] [SerializeField]
         private float maximumAngle = 90f;
 
         private float _xRotation;

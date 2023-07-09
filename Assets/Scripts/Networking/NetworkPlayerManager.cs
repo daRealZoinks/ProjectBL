@@ -6,16 +6,17 @@ namespace Networking
 {
     public class NetworkPlayerManager : NetworkBehaviour
     {
-        [Tooltip("The virtual camera that will follow the player")]
-        [SerializeField] private CinemachineVirtualCamera virtualCamera;
+        [Tooltip("The virtual camera that will follow the player")] [SerializeField]
+        private CinemachineVirtualCamera virtualCamera;
 
         [Space]
         [Header("Non-Owner Settings")]
         [Tooltip("The components to disable on non-owned players")]
-        [SerializeField] private Behaviour[] componentsToDisable;
-        
-        [Tooltip("The objects to destroy on non-owned players")]
-        [SerializeField] private GameObject[] objectsToDestroy;
+        [SerializeField]
+        private Behaviour[] componentsToDisable;
+
+        [Tooltip("The objects to destroy on non-owned players")] [SerializeField]
+        private GameObject[] objectsToDestroy;
 
         public override void OnNetworkSpawn()
         {

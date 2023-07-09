@@ -39,28 +39,28 @@ namespace LocalPlayer
         [SerializeField]
         private float wallJumpForwardForce = 4f; // m/s
 
-        private PlayerCharacterController _playerCharacterController;
+        private bool _canWallJump = true;
 
         private RaycastHit _leftHitInfo;
-        private RaycastHit _rightHitInfo;
 
-        private bool _canWallJump = true;
+        private PlayerCharacterController _playerCharacterController;
+        private RaycastHit _rightHitInfo;
 
         private Rigidbody _rigidbody;
         private bool _wallRunningEnabled = true;
 
         /// <summary>
-        ///     Whether the player character is currently running on a wall to the right.
+        ///     Whether the player is currently running on a wall to the right.
         /// </summary>
         public bool IsWallRight { get; private set; }
 
         /// <summary>
-        ///     Whether the player character is currently running on a wall to the left.
+        ///     Whether the player is currently running on a wall to the left.
         /// </summary>
         public bool IsWallLeft { get; private set; }
 
         /// <summary>
-        ///     Whether the player character is currently running on a wall.
+        ///     Whether the player is currently running on a wall.
         /// </summary>
         public bool IsWallRunning => IsWallRight || IsWallLeft;
 
@@ -73,14 +73,6 @@ namespace LocalPlayer
         private void Start()
         {
             OnWallJump += WallJumpAsync;
-        }
-
-        /// <summary>
-        ///     Makes the player character jump off the wall.
-        /// </summary>
-        public void WallJump()
-        {
-            if (IsWallRunning && _canWallJump) OnWallJump?.Invoke();
         }
 
         private void Update()
@@ -111,35 +103,31 @@ namespace LocalPlayer
             var wasWallRight = IsWallRight;
             var wasWallLeft = IsWallLeft;
 
-            if (!IsWallRight)
-                IsWallRight = Physics.Raycast(rightRay, out _rightHitInfo, wallCheckDistance,
-                    _playerCharacterController.GroundLayerMask);
+            IsWallRight = Physics.Raycast(rightRay, out _rightHitInfo, wallCheckDistance,
+                _playerCharacterController.GroundLayerMask);
+            IsWallLeft = Physics.Raycast(leftRay, out _leftHitInfo, wallCheckDistance,
+                _playerCharacterController.GroundLayerMask);
 
-            if (!IsWallLeft)
-                IsWallLeft = Physics.Raycast(leftRay, out _leftHitInfo, wallCheckDistance,
-                    _playerCharacterController.GroundLayerMask);
+            var boostForce = Vector3.zero;
 
-
-            Vector3 boostForce = Vector3.zero;
-
-            var velocity = _playerCharacterController.Velocity;
-
-            // take into account the direction the player is sliding along the wall
             if (IsWallRight && !wasWallRight)
-            {
                 boostForce = -Vector3.Cross(_rightHitInfo.normal, transform.up) * wallRunInitialImpulse;
-            }
 
             if (IsWallLeft && !wasWallLeft)
-            {
                 boostForce = Vector3.Cross(_leftHitInfo.normal, transform.up) * wallRunInitialImpulse;
-            }
 
             _rigidbody.AddForce(boostForce, ForceMode.VelocityChange);
 
-
             if (IsWallRight) _rigidbody.AddForce(-_rightHitInfo.normal, ForceMode.Acceleration);
             if (IsWallLeft) _rigidbody.AddForce(-_leftHitInfo.normal, ForceMode.Acceleration);
+        }
+
+        /// <summary>
+        ///     Makes the player character jump off the wall.
+        /// </summary>
+        public void WallJump()
+        {
+            if (IsWallRunning && _canWallJump) OnWallJump?.Invoke();
         }
 
         /// <summary>

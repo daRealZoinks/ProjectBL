@@ -1,5 +1,4 @@
-﻿using System;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
 
 namespace Networking
@@ -11,34 +10,30 @@ namespace Networking
     [RequireComponent(typeof(Rigidbody))]
     public class AdvancedNetworkRigidbody : NetworkBehaviour
     {
-        private Rigidbody _rigidbody;
+        private readonly NetworkVariable<Vector3> _networkAngularVelocity =
+            new(writePerm: NetworkVariableWritePermission.Owner);
 
-        private NetworkVariable<Vector3> _networkVelocity;
-        private NetworkVariable<Vector3> _networkAngularVelocity;
+        private readonly NetworkVariable<Vector3> _networkVelocity =
+            new(writePerm: NetworkVariableWritePermission.Owner);
+
+        private Rigidbody _rigidbody;
 
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
-
-            _networkVelocity = new NetworkVariable<Vector3>(writePerm: NetworkVariableWritePermission.Owner);
-            _networkAngularVelocity = new NetworkVariable<Vector3>(writePerm: NetworkVariableWritePermission.Owner);
         }
 
         private void FixedUpdate()
         {
-            SyncNetworkVariable(_networkVelocity, _rigidbody.velocity);
-            SyncNetworkVariable(_networkAngularVelocity, _rigidbody.angularVelocity);
-        }
-
-        private void SyncNetworkVariable<T>(NetworkVariable<T> networkVariable, T value)
-        {
             if (IsOwner)
             {
-                networkVariable.Value = value;
+                _networkVelocity.Value = _rigidbody.velocity;
+                _networkAngularVelocity.Value = _rigidbody.angularVelocity;
             }
             else
             {
-                value = networkVariable.Value;
+                _rigidbody.velocity = _networkVelocity.Value;
+                _rigidbody.angularVelocity = _networkAngularVelocity.Value;
             }
         }
     }

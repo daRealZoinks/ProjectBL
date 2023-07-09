@@ -7,17 +7,17 @@ namespace Menu
 {
     public class MainMenu : MonoBehaviour
     {
-        [Tooltip("The name of the scene to load when the play button is pressed.")]
-        [SerializeField] private string sceneName;
-        
+        [Tooltip("The name of the scene to load when the play button is pressed.")] [SerializeField]
+        private string sceneName;
+
+        private Label _loadingLabel;
+
         private VisualElement _mainMenu;
+        private Button _optionsButton;
         private VisualElement _optionsMenu;
 
         private Button _playButton;
-        private Button _optionsButton;
         private Button _quitButton;
-
-        private Label _loadingLabel;
 
         private void Awake()
         {
@@ -50,8 +50,9 @@ namespace Menu
         }
 
 #if UNITY_EDITOR
-        [Tooltip("The scene to load when the play button is pressed.")]
-        [SerializeField] private SceneAsset sceneAsset;
+        [Tooltip("The scene to load when the play button is pressed.")] [SerializeField]
+        private SceneAsset sceneAsset;
+
         private void OnValidate()
         {
             if (sceneAsset != null) sceneName = sceneAsset.name;
