@@ -7,13 +7,16 @@ namespace LocalPlayer
     [RequireComponent(typeof(PlayerWallRunController))]
     public class InputProvider : MonoBehaviour
     {
-        [Tooltip("The player camera controller")] [SerializeField]
+        [Tooltip("The player camera controller")]
+        [SerializeField]
         private PlayerCameraController playerCameraController;
 
-        [Tooltip("The melee attack")] [SerializeField]
+        [Tooltip("The melee attack")]
+        [SerializeField]
         private MeleeKick meleeKick;
 
-        [Tooltip("The weapon")] [SerializeField]
+        [Tooltip("The weapon")]
+        [SerializeField]
         private Weapon weapon;
 
         private PlayerCharacterController _playerCharacterController;
@@ -64,7 +67,8 @@ namespace LocalPlayer
             if (context.phase != InputActionPhase.Started) return;
 
             Debug.Log("Fire");
-            weapon.ExecuteShoot();
+
+            if (weapon) weapon.ExecuteShoot();
         }
 
         /// <summary>

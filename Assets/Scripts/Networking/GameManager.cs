@@ -1,7 +1,7 @@
+using LocalPlayer;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using LocalPlayer;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -29,6 +29,7 @@ namespace Networking
         private readonly NetworkVariable<int> _minutes = new();
         private readonly NetworkVariable<int> _orangeScore = new();
         private readonly NetworkVariable<int> _seconds = new();
+        private readonly NetworkVariable<bool> _paused = new();
 
         private CountdownTimer _countdownTimer;
 
@@ -81,6 +82,7 @@ namespace Networking
             }
 
             _countdownTimer.Resume();
+            _paused.Value = false;
             _countdownTimer.OnTimerExpired += OnTimerExpired;
         }
 
@@ -111,8 +113,8 @@ namespace Networking
             GUILayout.BeginArea(new Rect(10, 10, 200, 200));
             GUILayout.Label($"Blue: {BlueScore}");
             GUILayout.Label($"Orange: {OrangeScore}");
-            GUILayout.Label($"{_countdownTimer.Minutes:00}:{_countdownTimer.Seconds:00}");
-            if (_countdownTimer.IsPaused) GUILayout.Label("Paused");
+            GUILayout.Label($"{_minutes.Value:00}:{_seconds.Value:00}");
+            if (_paused.Value) GUILayout.Label("Paused");
             GUILayout.EndArea();
         }
 
@@ -145,6 +147,7 @@ namespace Networking
         {
             // Pause the timer
             _countdownTimer.Pause();
+            _paused.Value = true;
 
             // Disable the ball
             ballInstance.gameObject.SetActive(false);
@@ -154,8 +157,7 @@ namespace Networking
 
             // Reset the ball
             var ballInstanceTransform = ballInstance.transform;
-            ballInstanceTransform.position = ballSpawnPoint.position;
-            ballInstanceTransform.rotation = Quaternion.identity;
+            ballInstanceTransform.SetPositionAndRotation(ballSpawnPoint.position, Quaternion.identity);
 
             ballInstance.GetComponent<Rigidbody>().velocity = Vector3.zero;
             ballInstance.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
@@ -165,6 +167,7 @@ namespace Networking
 
             // Unpause the timer
             _countdownTimer.Resume();
+            _paused.Value = false;
         }
     }
 }
