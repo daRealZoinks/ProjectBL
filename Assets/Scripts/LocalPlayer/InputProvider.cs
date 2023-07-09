@@ -13,6 +13,9 @@ namespace LocalPlayer
         [Tooltip("The melee attack")] [SerializeField]
         private MeleeKick meleeKick;
 
+        [Tooltip("The weapon")] [SerializeField]
+        private Weapon weapon;
+
         private PlayerCharacterController _playerCharacterController;
         private PlayerWallRunController _playerWallRunController;
 
@@ -58,7 +61,10 @@ namespace LocalPlayer
         /// <param name="context"> The fire input context </param>
         public void OnFire(InputAction.CallbackContext context)
         {
-            if (context.phase == InputActionPhase.Started) Debug.Log("Fire"); 
+            if (context.phase != InputActionPhase.Started) return;
+
+            Debug.Log("Fire");
+            weapon.ExecuteShoot();
         }
 
         /// <summary>

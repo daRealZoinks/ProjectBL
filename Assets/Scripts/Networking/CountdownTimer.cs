@@ -66,7 +66,7 @@ namespace Networking
             _currentTime -= deltaTime;
 
             if (!(_currentTime <= 0f)) return;
-        
+
             _currentTime = 0f;
             IsPaused = true;
             OnTimerExpired?.Invoke();

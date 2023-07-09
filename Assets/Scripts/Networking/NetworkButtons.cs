@@ -8,7 +8,7 @@ namespace Networking
     public class NetworkButtons : MonoBehaviour
     {
         [SerializeField] private CursorController cursorController;
-        
+
         private UnityTransport _unityTransport;
 
         private void Start()

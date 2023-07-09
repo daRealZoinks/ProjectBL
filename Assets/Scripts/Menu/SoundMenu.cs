@@ -23,7 +23,7 @@ namespace Menu
             _masterVolumeSlider = root.Q<Slider>("master-volume-slider");
             _musicVolumeSlider = root.Q<Slider>("music-volume-slider");
             _sfxVolumeSlider = root.Q<Slider>("sfx-volume-slider");
-            
+
             _backButton = root.Q<Button>("sound-menu-back-button");
             _backButton.clicked += () =>
             {

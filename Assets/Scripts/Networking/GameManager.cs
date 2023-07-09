@@ -156,7 +156,7 @@ namespace Networking
             var ballInstanceTransform = ballInstance.transform;
             ballInstanceTransform.position = ballSpawnPoint.position;
             ballInstanceTransform.rotation = Quaternion.identity;
-            
+
             ballInstance.GetComponent<Rigidbody>().velocity = Vector3.zero;
             ballInstance.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 

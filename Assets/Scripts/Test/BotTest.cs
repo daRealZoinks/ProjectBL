@@ -33,9 +33,9 @@ namespace Test
             if (_target == null) return;
 
             Gizmos.color = Color.red;
-            
+
             var targetPosition = _target.position;
-            
+
             Gizmos.DrawSphere(targetPosition, 1f);
             Gizmos.DrawLine(artificialIntelligence.transform.position, targetPosition);
         }

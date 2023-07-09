@@ -7,11 +7,11 @@ namespace Networking
     {
         [SerializeField] private float interpolationFactor = 0.1f;
 
+        private readonly NetworkVariable<PlayerState> _playerState = new();
+
         private Vector3 _lastAngularVelocity;
         private Vector3 _lastPosition;
         private Vector3 _lastVelocity;
-
-        private readonly NetworkVariable<PlayerState> _playerState = new();
 
         private Rigidbody _rigidbody;
 
@@ -29,7 +29,7 @@ namespace Networking
         private void TransmitState()
         {
             var playerTransform = transform;
-            
+
             PlayerState playerState = new()
             {
                 Position = playerTransform.position,
@@ -50,13 +50,17 @@ namespace Networking
         private void ConsumeState()
         {
             var playerTransform = transform;
-            
-            playerTransform.position = Vector3.SmoothDamp(playerTransform.position, _playerState.Value.Position, ref _lastPosition,
+
+            playerTransform.position = Vector3.SmoothDamp(playerTransform.position, _playerState.Value.Position,
+                ref _lastPosition,
                 interpolationFactor);
-            transform.rotation = Quaternion.Slerp(playerTransform.rotation, _playerState.Value.Rotation, interpolationFactor);
-            _rigidbody.velocity = Vector3.SmoothDamp(_rigidbody.velocity, _playerState.Value.Velocity, ref _lastVelocity,
+            transform.rotation =
+                Quaternion.Slerp(playerTransform.rotation, _playerState.Value.Rotation, interpolationFactor);
+            _rigidbody.velocity = Vector3.SmoothDamp(_rigidbody.velocity, _playerState.Value.Velocity,
+                ref _lastVelocity,
                 interpolationFactor);
-            _rigidbody.angularVelocity = Vector3.SmoothDamp(_rigidbody.angularVelocity, _playerState.Value.AngularVelocity,
+            _rigidbody.angularVelocity = Vector3.SmoothDamp(_rigidbody.angularVelocity,
+                _playerState.Value.AngularVelocity,
                 ref _lastAngularVelocity, interpolationFactor);
         }
 

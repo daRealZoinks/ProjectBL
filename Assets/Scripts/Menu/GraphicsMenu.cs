@@ -198,7 +198,8 @@ namespace Menu
                 var value = int.Parse(refreshRateValue.Split('h')[0]);
 
                 // find the refreshRate with the same value
-                foreach (var refreshRate in refreshRates.Where(refreshRate => Math.Abs(refreshRate.value - value) < 0.1f))
+                foreach (var refreshRate in refreshRates.Where(
+                             refreshRate => Math.Abs(refreshRate.value - value) < 0.1f))
                 {
                     Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height,
                         Screen.fullScreenMode, refreshRate);
