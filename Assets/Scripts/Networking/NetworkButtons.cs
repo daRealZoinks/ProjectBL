@@ -36,9 +36,7 @@ namespace Networking
                 GUILayout.EndHorizontal();
 
                 if (GUILayout.Button("Host")) networkManager.StartHost();
-
                 if (GUILayout.Button("Client")) networkManager.StartClient();
-
                 if (GUILayout.Button("Server")) networkManager.StartServer();
             }
 

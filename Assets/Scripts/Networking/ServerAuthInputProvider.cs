@@ -9,11 +9,17 @@ namespace Networking
     [RequireComponent(typeof(PlayerWallRunController))]
     public class ServerAuthInputProvider : NetworkBehaviour
     {
-        [Tooltip("The player camera controller")] [SerializeField]
+        [Tooltip("The player camera controller")]
+        [SerializeField]
         private PlayerCameraController playerCameraController;
 
-        [Tooltip("The melee attack")] [SerializeField]
+        [Tooltip("The melee attack")]
+        [SerializeField]
         private MeleeKick meleeKick;
+
+        [Tooltip("The weapon manager")]
+        [SerializeField]
+        private WeaponManager weaponManager;
 
         private PlayerCharacterController _playerCharacterController;
         private PlayerWallRunController _playerWallRunController;
@@ -38,7 +44,10 @@ namespace Networking
                 _ => Vector2.zero
             };
 
-            if (IsOwner) OnMoveServerRpc(value);
+            if (IsClient)
+            {
+                OnMoveServerRpc(value);
+            }
 
             Move(value);
         }
@@ -46,13 +55,7 @@ namespace Networking
         [ServerRpc]
         private void OnMoveServerRpc(Vector2 value)
         {
-            OnMoveClientRpc(value);
-        }
-
-        [ClientRpc]
-        private void OnMoveClientRpc(Vector2 value)
-        {
-            if (!IsOwner) Move(value);
+            Move(value);
         }
 
         private void Move(Vector2 value)
@@ -74,7 +77,10 @@ namespace Networking
                 _ => Vector2.zero
             };
 
-            if (IsOwner) OnLookServerRpc(value);
+            if (IsClient)
+            {
+                OnLookServerRpc(value);
+            }
 
             Look(value);
         }
@@ -82,13 +88,7 @@ namespace Networking
         [ServerRpc]
         private void OnLookServerRpc(Vector2 value)
         {
-            OnLookClientRpc(value);
-        }
-
-        [ClientRpc]
-        private void OnLookClientRpc(Vector2 value)
-        {
-            if (!IsOwner) Look(value);
+            Look(value);
         }
 
         private void Look(Vector2 value)
@@ -104,25 +104,24 @@ namespace Networking
         {
             if (context.phase != InputActionPhase.Started) return;
 
-            if (IsOwner) OnFireServerRpc();
+            if (IsClient)
+            {
+                OnFireServerRpc();
+            }
+
             Fire();
         }
 
         [ServerRpc]
         private void OnFireServerRpc()
         {
-            OnFireClientRpc();
-        }
-
-        [ClientRpc]
-        private void OnFireClientRpc()
-        {
-            if (!IsOwner) Fire();
+            Fire();
         }
 
         private void Fire()
         {
-            // TODO: Fire
+            if (weaponManager.ActiveWeapon) weaponManager.Shoot();
+            else meleeKick.Attack();
         }
 
         /// <summary>
@@ -133,20 +132,18 @@ namespace Networking
         {
             if (context.phase != InputActionPhase.Started) return;
 
-            if (IsOwner) OnJumpServerRpc();
+            if (IsClient)
+            {
+                OnJumpServerRpc();
+            }
+
             Jump();
         }
 
         [ServerRpc]
         private void OnJumpServerRpc()
         {
-            OnJumpClientRpc();
-        }
-
-        [ClientRpc]
-        private void OnJumpClientRpc()
-        {
-            if (!IsOwner) Jump();
+            Jump();
         }
 
         private void Jump()
@@ -163,20 +160,18 @@ namespace Networking
         {
             if (context.phase != InputActionPhase.Started) return;
 
-            if (IsOwner) OnMeleeServerRpc();
+            if (IsClient)
+            {
+                OnMeleeServerRpc();
+            }
+
             Melee();
         }
 
         [ServerRpc]
         private void OnMeleeServerRpc()
         {
-            OnMeleeClientRpc();
-        }
-
-        [ClientRpc]
-        private void OnMeleeClientRpc()
-        {
-            if (!IsOwner) Melee();
+            Melee();
         }
 
         private void Melee()

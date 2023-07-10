@@ -81,7 +81,7 @@ namespace LocalPlayer
         /// <summary>
         ///     The velocity of the player.
         /// </summary>
-        public Vector3 Velocity => _rigidbody.velocity;
+        public Vector3 Velocity => _rigidbody ? _rigidbody.velocity : Vector3.zero;
 
         /// <summary>
         ///     The maximum speed of the player.
@@ -108,6 +108,29 @@ namespace LocalPlayer
             if (MovementEnabled) MovementLogic();
             GroundCheck();
             if (_floatingEnabled) Floating();
+        }
+
+        private void OnDrawGizmos()
+        {
+            // draw the velocity
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, transform.position + Velocity);
+
+            // draw the movement input
+            Gizmos.color = Color.green;
+            var movementInput = MovementInput.x * transform.right + MovementInput.y * transform.forward;
+            Gizmos.DrawLine(transform.position, transform.position + movementInput);
+
+            // draw the ray
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(transform.position, transform.position + Vector3.down * rayLength);
+
+            // draw a shpere on the ground
+            if (_rayDidHit)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawSphere(_hitInfo.point, 0.1f);
+            }
         }
 
         /// <summary>

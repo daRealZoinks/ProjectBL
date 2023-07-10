@@ -35,5 +35,14 @@ namespace LocalPlayer
 
             playerCharacterController.transform.Rotate(LookInput.x * sensitivity * Vector3.up);
         }
+
+        private void OnDrawGizmos()
+        {
+            var cameraTransform = transform;
+            var cameraTransformPosition = cameraTransform.position;
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(cameraTransformPosition, cameraTransformPosition + cameraTransform.forward * 5f);
+        }
     }
 }

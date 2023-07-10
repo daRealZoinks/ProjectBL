@@ -122,6 +122,36 @@ namespace LocalPlayer
             if (IsWallLeft) _rigidbody.AddForce(-_leftHitInfo.normal, ForceMode.Acceleration);
         }
 
+        private void OnDrawGizmos()
+        {
+            var playerTransform = transform;
+            var playerTransformPosition = playerTransform.position;
+            var playerTransformRight = playerTransform.right;
+
+            Ray rightRay = new(playerTransformPosition, playerTransformRight);
+            Ray leftRay = new(playerTransformPosition, -playerTransformRight);
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawRay(rightRay.origin, rightRay.direction * wallCheckDistance);
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawRay(leftRay.origin, leftRay.direction * wallCheckDistance);
+
+            if (IsWallRight)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawSphere(_rightHitInfo.point, 0.1f);
+                Gizmos.DrawRay(_rightHitInfo.point, _rightHitInfo.normal);
+            }
+
+            if (IsWallLeft)
+            {
+                Gizmos.color = Color.blue;
+                Gizmos.DrawSphere(_leftHitInfo.point, 0.1f);
+                Gizmos.DrawRay(_leftHitInfo.point, _leftHitInfo.normal);
+            }
+        }
+
         /// <summary>
         ///     Makes the player character jump off the wall.
         /// </summary>

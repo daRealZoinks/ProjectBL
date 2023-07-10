@@ -102,7 +102,7 @@ MonoBehaviour:
   coolDown: 1
   projectilePrefab: {fileID: 3511517331536362791, guid: a9753165e0f1d8b41a01a4f1e9ceda0f,
     type: 3}
-  projectileSpeed: 20
+  projectileSpeed: 85
 --- !u!1 &7689591315344221308
 GameObject:
   m_ObjectHideFlags: 0

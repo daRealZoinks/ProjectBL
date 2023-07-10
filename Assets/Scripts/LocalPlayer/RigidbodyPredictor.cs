@@ -35,8 +35,14 @@ namespace LocalPlayer
                     break;
                 }
 
-                var velocityWithGravity = _rigidbody.velocity + Physics.gravity * predictionTimeStep;
-                var predictedPosition = transform.position + velocityWithGravity * predictionTimeStep;
+                var predictedPosition = transform.position + rigidbodyVelocity * predictionTimeStep;
+
+                if (_rigidbody.useGravity)
+                {
+                    var velocityWithGravity = rigidbodyVelocity + Physics.gravity * predictionTimeStep;
+                    predictedPosition += velocityWithGravity * predictionTimeStep;
+                }
+
                 _predictedPath.Add(predictedPosition);
             }
         }

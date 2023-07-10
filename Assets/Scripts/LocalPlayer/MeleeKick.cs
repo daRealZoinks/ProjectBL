@@ -21,6 +21,15 @@ namespace LocalPlayer
         /// </summary>
         public float KickRange => kickRange;
 
+        private void OnDrawGizmos()
+        {
+            var cameraTransform = transform;
+            var cameraTransformPosition = cameraTransform.position;
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(cameraTransformPosition + cameraTransform.forward * kickRange, kickRadius);
+        }
+
         /// <summary>
         ///     Hit all rigidbodies in the kick range.
         /// </summary>

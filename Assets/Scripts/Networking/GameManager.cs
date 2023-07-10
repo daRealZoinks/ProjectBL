@@ -1,7 +1,7 @@
-using LocalPlayer;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using LocalPlayer;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -11,7 +11,6 @@ namespace Networking
     public class GameManager : NetworkBehaviour
     {
         [SerializeField] private NetworkObject ballPrefab;
-        [SerializeField] private NetworkObject ballInstance;
         [SerializeField] private Transform ballSpawnPoint;
 
         [SerializeField] private NetworkObject artificialIntelligencePrefab;
@@ -22,33 +21,34 @@ namespace Networking
         [SerializeField] private GoalPost blueGoalPosts;
         [SerializeField] private GoalPost orangeGoalPosts;
 
-        [SerializeField] private List<ArtificialIntelligence> artificialIntelligences = new();
+        private NetworkObject _ballInstance;
+        private List<ArtificialIntelligence> _artificialIntelligences = new();
 
         private readonly NetworkVariable<int> _blueScore = new();
 
         private readonly NetworkVariable<int> _minutes = new();
         private readonly NetworkVariable<int> _orangeScore = new();
-        private readonly NetworkVariable<int> _seconds = new();
         private readonly NetworkVariable<bool> _paused = new();
+        private readonly NetworkVariable<int> _seconds = new();
 
         private CountdownTimer _countdownTimer;
 
         /// <summary>
         ///     The score of the blue team.
         /// </summary>
-        public int BlueScore
+        private int BlueScore
         {
             get => _blueScore.Value;
-            private set => _blueScore.Value = value;
+            set => _blueScore.Value = value;
         }
 
         /// <summary>
         ///     The score of the orange team.
         /// </summary>
-        public int OrangeScore
+        private int OrangeScore
         {
             get => _orangeScore.Value;
-            private set => _orangeScore.Value = value;
+            set => _orangeScore.Value = value;
         }
 
         private void Start()
@@ -57,9 +57,9 @@ namespace Networking
 
             if (!IsServer) return;
 
-            ballInstance = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity);
+            _ballInstance = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity);
 
-            ballInstance.Spawn();
+            _ballInstance.Spawn();
 
             if (automaticNumberOfArtificialIntelligences)
                 numberOfArtificialIntelligences = 6 - NetworkManager.Singleton.ConnectedClientsList.Count;
@@ -73,12 +73,12 @@ namespace Networking
 
                 var artificialIntelligence = artificialIntelligenceInstance.GetComponent<ArtificialIntelligence>();
 
-                var ballInstanceTransform = ballInstance.transform;
+                var ballInstanceTransform = _ballInstance.transform;
 
                 artificialIntelligence.MoveTarget = ballInstanceTransform;
                 artificialIntelligence.LookTarget = ballInstanceTransform;
 
-                artificialIntelligences.Add(artificialIntelligence);
+                _artificialIntelligences.Add(artificialIntelligence);
             }
 
             _countdownTimer.Resume();
@@ -122,52 +122,65 @@ namespace Networking
         {
             Debug.Log("Timer expired!");
             // destroy ball 
-            ballInstance.Despawn();
+            _ballInstance.Despawn();
         }
 
         private async void OnBlueGoalAsync()
         {
-            if (!IsServer) return;
-
-            OrangeScore++;
+            if (IsServer)
+            {
+                OrangeScore++;
+            }
 
             await ResetBallAsync();
         }
 
         private async void OnOrangeGoalAsync()
         {
-            if (!IsServer) return;
-
-            BlueScore++;
+            if (IsServer)
+            {
+                BlueScore++;
+            }
 
             await ResetBallAsync();
         }
 
         private async Task ResetBallAsync()
         {
-            // Pause the timer
-            _countdownTimer.Pause();
-            _paused.Value = true;
+            if (!_ballInstance) return;
+
+            if (IsServer)
+            {
+                // Pause the timer
+                _countdownTimer.Pause();
+                _paused.Value = true;
+            }
 
             // Disable the ball
-            ballInstance.gameObject.SetActive(false);
+            _ballInstance.gameObject.SetActive(false);
 
             // Wait for 3 seconds
             await Task.Delay(TimeSpan.FromSeconds(3f));
 
-            // Reset the ball
-            var ballInstanceTransform = ballInstance.transform;
-            ballInstanceTransform.SetPositionAndRotation(ballSpawnPoint.position, Quaternion.identity);
+            if (IsServer)
+            {
+                // Reset the ball
+                var ballInstanceTransform = _ballInstance.transform;
+                ballInstanceTransform.SetPositionAndRotation(ballSpawnPoint.position, Quaternion.identity);
 
-            ballInstance.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            ballInstance.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                _ballInstance.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                _ballInstance.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+            }
 
             // Enable the ball
-            ballInstance.gameObject.SetActive(true);
+            _ballInstance.gameObject.SetActive(true);
 
-            // Unpause the timer
-            _countdownTimer.Resume();
-            _paused.Value = false;
+            if (IsServer)
+            {
+                // Unpause the timer
+                _countdownTimer.Resume();
+                _paused.Value = false;
+            }
         }
     }
 }

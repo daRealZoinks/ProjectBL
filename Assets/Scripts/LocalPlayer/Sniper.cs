@@ -4,8 +4,7 @@ namespace LocalPlayer
 {
     public class Sniper : HitScanWeapon
     {
-        [Tooltip("The force of the sniper hit")]
-        [SerializeField]
+        [Tooltip("The force of the sniper hit")] [SerializeField]
         private float force = 2500f;
 
         protected override void Shoot()

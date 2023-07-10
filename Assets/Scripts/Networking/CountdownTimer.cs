@@ -26,7 +26,7 @@ namespace Networking
         /// <summary>
         ///     If the timer is paused.
         /// </summary>
-        public bool IsPaused { get; private set; } = true;
+        private bool IsPaused { get; set; } = true;
 
         private void Start()
         {

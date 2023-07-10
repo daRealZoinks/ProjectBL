@@ -8,6 +8,7 @@ namespace LocalPlayer
         private void OnCollisionEnter(Collision other)
         {
             if (other.gameObject.CompareTag("Ball")) OnGoal?.Invoke();
+            Debug.Log("Goal!");
         }
 
         /// <summary>

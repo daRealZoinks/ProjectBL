@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace LocalPlayer
 {
+    /// <summary>
+    ///     The artificial intelligence to use for moving towards the target.
+    /// </summary>
     public class ArtificialIntelligence : MonoBehaviour
     {
         [Tooltip("The player camera controller to use for looking at the target.")] [SerializeField]
@@ -41,6 +44,29 @@ namespace LocalPlayer
             var distanceFromCharacterToTarget =
                 (_playerCharacterController.transform.position - targetPosition).magnitude;
             if (distanceFromCharacterToTarget < meleeKick.KickRange) meleeKick.Attack();
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (MoveTarget != null)
+            {
+                Gizmos.color = Color.red;
+
+                var targetPosition = MoveTarget.position;
+
+                Gizmos.DrawSphere(targetPosition, 0.5f);
+                Gizmos.DrawLine(transform.position, targetPosition);
+            }
+
+            if (LookTarget != null)
+            {
+                Gizmos.color = Color.blue;
+
+                var targetPosition = LookTarget.position;
+
+                Gizmos.DrawSphere(targetPosition, 0.5f);
+                Gizmos.DrawLine(transform.position, targetPosition);
+            }
         }
 
         private Vector2 MoveTowards(Vector3 target)
