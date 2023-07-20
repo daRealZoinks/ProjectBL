@@ -208,7 +208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fcc3ac67e478b644bd0deea8c539068, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  artificialIntelligence: {fileID: 196740461}
+  artificialIntelligence: {fileID: 0}
 --- !u!43 &38156838
 Mesh:
   m_ObjectHideFlags: 0
@@ -1749,18 +1749,6 @@ Transform:
   m_Father: {fileID: 1215026921}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &196740461 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1189642668055273295, guid: 33c90886fbbfc3b489a73410829972cd,
-    type: 3}
-  m_PrefabInstance: {fileID: 417028460}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a04ac2ef2601cd740b86292667eab2b7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &203844586
 GameObject:
   m_ObjectHideFlags: 0
@@ -4000,6 +3988,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2019391950164801923, guid: 33c90886fbbfc3b489a73410829972cd,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2019391950164801923, guid: 33c90886fbbfc3b489a73410829972cd,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7074824119205968794, guid: 33c90886fbbfc3b489a73410829972cd,
         type: 3}
       propertyPath: m_Name

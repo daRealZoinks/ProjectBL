@@ -6,7 +6,8 @@ namespace Networking
 {
     public class NetworkPlayerManager : NetworkBehaviour
     {
-        [Tooltip("The virtual camera that will follow the player")] [SerializeField]
+        [Tooltip("The virtual camera that will follow the player")]
+        [SerializeField]
         private CinemachineVirtualCamera virtualCamera;
 
         [Space]
@@ -15,16 +16,21 @@ namespace Networking
         [SerializeField]
         private Behaviour[] componentsToDisable;
 
-        [Tooltip("The objects to destroy on non-owned players")] [SerializeField]
+        [Tooltip("The objects to destroy on non-owned players")]
+        [SerializeField]
         private GameObject[] objectsToDestroy;
 
         public override void OnNetworkSpawn()
         {
-            if (IsOwner) return;
-
-            foreach (var component in componentsToDisable) component.enabled = false;
-            foreach (var obj in objectsToDestroy) Destroy(obj);
-            virtualCamera.Priority = 5;
+            if (IsOwner)
+            {
+                virtualCamera.Priority = 10;
+            }
+            else
+            {
+                foreach (var component in componentsToDisable) component.enabled = false;
+                foreach (var obj in objectsToDestroy) Destroy(obj);
+            }
         }
     }
 }

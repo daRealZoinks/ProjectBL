@@ -4,22 +4,32 @@ namespace LocalPlayer
 {
     public class LateralTiltController : MonoBehaviour
     {
-        [Tooltip("Whether or not the lateral tilt is enabled")] [SerializeField]
+        [Tooltip("Whether or not the lateral tilt is enabled")]
+        [SerializeField]
         private bool lateralTiltEnabled = true;
 
-        [Header("Tilt")] [Tooltip("The angle of tilt when the player is moving")] [SerializeField] [Range(0, 10f)]
+        [Header("Tilt")]
+        [Tooltip("The angle of tilt when the player is moving")]
+        [SerializeField]
+        [Range(0, 10f)]
         private float angle = 2f;
 
-        [Tooltip("The angle of tilt when the player is wall running")] [SerializeField] [Range(0, 10f)]
+        [Tooltip("The angle of tilt when the player is wall running")]
+        [SerializeField]
+        [Range(0, 10f)]
         private float wallRunAngle = 5f;
 
-        [Tooltip("The speed of the tilt when the player is moving")] [SerializeField] [Range(0, 15f)]
+        [Tooltip("The speed of the tilt when the player is moving")]
+        [SerializeField]
+        [Range(0, 15f)]
         private float speed = 5f;
 
-        [Tooltip("The player character controller")] [SerializeField]
+        [Tooltip("The player character controller")]
+        [SerializeField]
         private PlayerCharacterController playerCharacterController;
 
-        [Tooltip("The player wall run controller")] [SerializeField]
+        [Tooltip("The player wall run controller")]
+        [SerializeField]
         private PlayerWallRunController playerWallRunController;
 
         private Vector3 _startRotation;

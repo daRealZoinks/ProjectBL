@@ -40,7 +40,7 @@ namespace Networking
                 if (GUILayout.Button("Server")) networkManager.StartServer();
             }
 
-            cursorController.HideCursor = networkManager.IsClient || networkManager.IsServer || networkManager.IsHost;
+            cursorController.HideCursor = networkManager.IsClient;
 
             GUILayout.EndArea();
         }

@@ -8,40 +8,59 @@ namespace LocalPlayer
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerCharacterController : MonoBehaviour
     {
-        [Header("Movement")] [Tooltip("The acceleration of the player in m/s^2")] [SerializeField]
+        [Header("Movement")]
+        [Tooltip("The acceleration of the player in m/s^2")]
+        [SerializeField]
         private float acceleration = 4096f; // m/s^2
 
-        [Tooltip("The deceleration of the player in m/s^2")] [SerializeField]
+        [Tooltip("The deceleration of the player in m/s^2")]
+        [SerializeField]
         private float deceleration = 700f; // m/s^2
 
-        [Tooltip("The maximum speed of the player in m/s")] [SerializeField]
+        [Tooltip("The maximum speed of the player in m/s")]
+        [SerializeField]
         private float maxSpeed = 13f; // m/s
 
-        [Space] [Header("Jump")] [Tooltip("The height of the player's jump in m")] [SerializeField]
+        [Space]
+        [Header("Jump")]
+        [Tooltip("The height of the player's jump in m")]
+        [SerializeField]
         private float jumpHeight = 3f; // m
 
-        [Tooltip("The amount of time the player has to wait before being able to jump again in s")] [SerializeField]
+        [Tooltip("The amount of time the player has to wait before being able to jump again in s")]
+        [SerializeField]
         private float jumpCooldown = 0.4f; // s
 
-        [Tooltip("The amount of control the player has in the air")] [SerializeField] [Range(0, 1f)]
+        [Tooltip("The amount of control the player has in the air")]
+        [SerializeField]
+        [Range(0, 1f)]
         private float airControl = 0.1f; // 0-1 (0 = no control, 1 = full control)
 
-        [Tooltip("The amount of air braking the player has")] [SerializeField] [Range(0, 1f)]
+        [Tooltip("The amount of air braking the player has")]
+        [SerializeField]
+        [Range(0, 1f)]
         private float airBrake; // 0-1 (0 = no brake, 1 = full brake)
 
-        [Space] [Header("Grounding")] [Tooltip("The height of the player's capsule in m")] [SerializeField]
+        [Space]
+        [Header("Grounding")]
+        [Tooltip("The height of the player's capsule in m")]
+        [SerializeField]
         private float rideHeight = 1f; // m
 
-        [Tooltip("The length of the raycast used to detect the ground in m")] [SerializeField]
+        [Tooltip("The length of the raycast used to detect the ground in m")]
+        [SerializeField]
         private float rayLength = 1.1f; // m
 
-        [Tooltip("The strength of the spring used to keep the player grounded in N/m")] [SerializeField]
+        [Tooltip("The strength of the spring used to keep the player grounded in N/m")]
+        [SerializeField]
         private float rideSpringStrength = 100f; // N/m
 
-        [Tooltip("The damper of the spring used to keep the player grounded in N/(m/s)")] [SerializeField]
+        [Tooltip("The damper of the spring used to keep the player grounded in N/(m/s)")]
+        [SerializeField]
         private float rideSpringDamper = 10f; // N/(m/s)
 
-        [Tooltip("The layer mask used to detect the ground")] [SerializeField]
+        [Tooltip("The layer mask used to detect the ground")]
+        [SerializeField]
         private LayerMask groundLayerMask;
 
         private bool _canJump = true;
@@ -179,7 +198,7 @@ namespace LocalPlayer
             var wasGrounded = IsGrounded;
             IsGrounded = _rayDidHit && _hitInfo.distance <= rideHeight;
 
-            if (IsGrounded && !wasGrounded) OnLand?.Invoke(_rigidbody.velocity.y);
+            if (IsGrounded && !wasGrounded) OnLand?.Invoke(-_rigidbody.velocity.y);
         }
 
         private void Floating()
