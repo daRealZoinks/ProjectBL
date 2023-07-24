@@ -1,11 +1,12 @@
-using LocalPlayer;
+using LocalPlayer.Player;
 using UnityEngine;
 
 namespace Test
 {
     public class BotTest : MonoBehaviour
     {
-        [Tooltip("The artificial intelligence to use for moving towards the target.")] [SerializeField]
+        [Tooltip("The artificial intelligence to use for moving towards the target.")]
+        [SerializeField]
         private ArtificialIntelligence artificialIntelligence;
 
         private Transform _target;
