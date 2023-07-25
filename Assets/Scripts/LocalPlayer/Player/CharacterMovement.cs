@@ -71,6 +71,42 @@ namespace LocalPlayer.Player
             OnJump += CharacterMovement_OnJump;
         }
 
+        public override void OnNetworkSpawn()
+        {
+            NetworkManager.NetworkTickSystem.Tick += NetworkTickSystem_Tick;
+        }
+
+        private void NetworkTickSystem_Tick()
+        {
+            if (!IsClient && !IsServer) return;
+
+            float physicsFrequency = 1 / Time.fixedDeltaTime;
+            float elapsedTicks = physicsFrequency / NetworkManager.NetworkTickSystem.TickRate;
+
+            if (MovementEnabled) Move(MovementInput, elapsedTicks);
+
+            ApplyGravity(gravityScale, elapsedTicks);
+        }
+
+        private void FixedUpdate()
+        {
+            if (IsClient || IsServer) return;
+
+            if (MovementEnabled) Move(MovementInput);
+
+            ApplyGravity(gravityScale);
+        }
+
+        void ApplyGravity(float gravityScale, float deltaTime = 1.0f)
+        {
+            Rigidbody.AddForce((gravityScale - 1) * deltaTime * Physics.gravity, ForceMode.Acceleration);
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            NetworkManager.NetworkTickSystem.Tick -= NetworkTickSystem_Tick;
+        }
+
         private void OnCollisionStay(Collision collision)
         {
             IsGrounded = false;
@@ -90,13 +126,6 @@ namespace LocalPlayer.Player
         private void OnCollisionExit(Collision collision)
         {
             IsGrounded = false;
-        }
-
-        private void FixedUpdate()
-        {
-            if (MovementEnabled) Move(MovementInput);
-
-            Rigidbody.AddForce(Physics.gravity * (gravityScale - 1), ForceMode.Acceleration);
         }
 
         private void Move(Vector2 movementInput, float deltaTime = 1.0f)
@@ -134,7 +163,6 @@ namespace LocalPlayer.Player
             OnJump?.Invoke();
         }
 
-        //an on land delegate 
         public delegate void OnLandedCallback(float fallSpeed);
 
         public event UnityAction OnJump;

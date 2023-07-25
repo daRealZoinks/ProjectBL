@@ -149,7 +149,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6791358282154724625}
   serializedVersion: 4
-  m_Mass: 80
+  m_Mass: 200
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -167,7 +167,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &8551645547252935201
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,7 +214,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1fda6662ff357c4185f79c018e064b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  synchronizeVelocity: 1
-  synchronizeAngularVelocity: 0
-  teleportEnabled: 0
-  teleportIfDistanceGreaterThan: 3
+  InterpolationTime: 0.1

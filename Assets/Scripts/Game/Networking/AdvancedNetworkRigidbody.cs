@@ -10,14 +10,20 @@ namespace Game.Networking
     [RequireComponent(typeof(Rigidbody))]
     public class AdvancedNetworkRigidbody : NetworkBehaviour
     {
-        private Rigidbody _rigidbody;
+        [SerializeField]
+        private float InterpolationTime = 0.1f;
 
+        private Rigidbody _rigidbody;
         private readonly NetworkVariable<AdvancedNetworkRigidbodyState> _networkState = new(writePerm: NetworkVariableWritePermission.Owner);
 
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
         }
+
+        private float _lastStateTime;
+
+        private AdvancedNetworkRigidbodyState _lastState;
 
         private void FixedUpdate()
         {
@@ -26,24 +32,34 @@ namespace Game.Networking
                 _networkState.Value = new()
                 {
                     Position = _rigidbody.position,
-                    Rotation = _rigidbody.rotation,
+                    Rotation = _rigidbody.rotation.eulerAngles,
                     Velocity = _rigidbody.velocity,
                     AngularVelocity = _rigidbody.angularVelocity
                 };
             }
             else
             {
-                _rigidbody.position = _networkState.Value.Position;
-                _rigidbody.rotation = _networkState.Value.Rotation;
-                _rigidbody.velocity = _networkState.Value.Velocity;
-                _rigidbody.angularVelocity = _networkState.Value.AngularVelocity;
+                float timeSinceLastState = Time.time - _lastStateTime;
+                float lerpT = Mathf.Clamp01(timeSinceLastState / InterpolationTime);
+
+                _rigidbody.position = Vector3.Lerp(_lastState.Position, _networkState.Value.Position, lerpT);
+                _rigidbody.velocity = Vector3.Lerp(_lastState.Velocity, _networkState.Value.Velocity, lerpT);
+                _rigidbody.angularVelocity = Vector3.Lerp(_lastState.AngularVelocity, _networkState.Value.AngularVelocity, lerpT);
+
+                Quaternion lastRotation = Quaternion.Euler(_lastState.Rotation);
+                Quaternion targetRotation = Quaternion.Euler(_networkState.Value.Rotation);
+                Quaternion slerpRotation = Quaternion.Slerp(lastRotation, targetRotation, lerpT);
+                _rigidbody.rotation = slerpRotation;
+
+                _lastStateTime = Time.time;
+                _lastState = _networkState.Value;
             }
         }
 
         public struct AdvancedNetworkRigidbodyState : INetworkSerializable
         {
             private Vector3 _position;
-            private Quaternion _rotation;
+            private Vector3 _rotation;
             private Vector3 _velocity;
             private Vector3 _angularVelocity;
 
@@ -52,7 +68,7 @@ namespace Game.Networking
                 readonly get => _position;
                 set => _position = value;
             }
-            public Quaternion Rotation
+            public Vector3 Rotation
             {
                 readonly get => _rotation;
                 set => _rotation = value;
