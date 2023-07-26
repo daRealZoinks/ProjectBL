@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace LocalPlayer
+namespace GameFramework.Game
 {
     public class GoalPost : MonoBehaviour
     {

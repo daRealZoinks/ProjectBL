@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LocalPlayer
+namespace GameFramework.Game
 {
     [RequireComponent(typeof(Rigidbody))]
     public class RigidbodyPredictor : MonoBehaviour

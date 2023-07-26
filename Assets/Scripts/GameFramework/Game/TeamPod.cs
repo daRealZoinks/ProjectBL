@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace Game
+namespace GameFramework.Game
 {
     public class TeamPod : MonoBehaviour
     {

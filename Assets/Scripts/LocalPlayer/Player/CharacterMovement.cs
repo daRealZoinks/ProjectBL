@@ -6,7 +6,7 @@ using UnityEngine.Events;
 namespace LocalPlayer.Player
 {
     [RequireComponent(typeof(Rigidbody))]
-    public sealed class CharacterMovement : NetworkBehaviour
+    public class CharacterMovement : NetworkBehaviour
     {
         [Header("Movement")]
         [SerializeField]
@@ -46,19 +46,12 @@ namespace LocalPlayer.Player
         public float AirControl => airControl;
         public float AirBrake => airBrake;
         public LayerMask GroundLayerMask => groundLayerMask;
-
         public Transform Transform => transform;
-
         public Rigidbody Rigidbody { get; private set; }
-
         public bool IsGrounded { get; private set; }
-
         public Vector3 Velocity => Rigidbody ? Rigidbody.velocity : Vector3.zero;
-
         public bool MovementEnabled { get; set; } = true;
-
         public Vector2 MovementInput { get; set; }
-
         public bool Stopping => MovementInput == Vector2.zero;
 
         private void Awake()
@@ -78,14 +71,13 @@ namespace LocalPlayer.Player
 
         private void NetworkTickSystem_Tick()
         {
-            if (!IsClient && !IsServer) return;
+            if (!IsServer && !IsClient) return;
 
             float physicsFrequency = 1 / Time.fixedDeltaTime;
             float elapsedTicks = physicsFrequency / NetworkManager.NetworkTickSystem.TickRate;
 
             if (MovementEnabled) Move(MovementInput, elapsedTicks);
-
-            ApplyGravity(gravityScale, elapsedTicks);
+            ApplyGravity(gravityScale);
         }
 
         private void FixedUpdate()
@@ -93,11 +85,10 @@ namespace LocalPlayer.Player
             if (IsClient || IsServer) return;
 
             if (MovementEnabled) Move(MovementInput);
-
             ApplyGravity(gravityScale);
         }
 
-        void ApplyGravity(float gravityScale, float deltaTime = 1.0f)
+        private void ApplyGravity(float gravityScale, float deltaTime = 1.0f)
         {
             Rigidbody.AddForce((gravityScale - 1) * deltaTime * Physics.gravity, ForceMode.Acceleration);
         }

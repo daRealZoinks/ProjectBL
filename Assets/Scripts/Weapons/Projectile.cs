@@ -1,10 +1,8 @@
-using LocalPlayer;
 using UnityEngine;
 
 namespace Weapons
 {
     [RequireComponent(typeof(Rigidbody))]
-    [RequireComponent(typeof(RigidbodyPredictor))]
     public class Projectile : MonoBehaviour
     {
         [Tooltip("The time the projectile will be destroyed after being launched")]

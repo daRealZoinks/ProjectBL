@@ -1,4 +1,3 @@
-using LocalPlayer;
 using LocalPlayer.Player;
 using System;
 using System.Collections.Generic;
@@ -6,7 +5,7 @@ using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace Game
+namespace GameFramework.Game
 {
     [RequireComponent(typeof(CountdownTimer))]
     public class GameManager : NetworkBehaviour

@@ -1,9 +1,8 @@
-using LocalPlayer;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 
-namespace Game
+namespace GameFramework.Game
 {
     public class NetworkButtons : MonoBehaviour
     {

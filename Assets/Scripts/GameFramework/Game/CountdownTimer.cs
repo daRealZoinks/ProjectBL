@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Game
+namespace GameFramework.Game
 {
     public class CountdownTimer : MonoBehaviour
     {

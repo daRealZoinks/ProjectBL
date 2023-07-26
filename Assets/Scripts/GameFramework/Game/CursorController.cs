@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace LocalPlayer
+namespace GameFramework.Game
 {
     /// <summary>
     ///     Controller for the cursor's visibility

@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Game
+namespace GameFramework.Game
 {
     public class TeamPodManager : MonoBehaviour
     {

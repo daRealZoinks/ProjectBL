@@ -1,7 +1,7 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
 
-namespace Game.Networking
+namespace GameFramework.Networking
 {
     /// <summary>
     ///     Allows for the use of <see cref="Rigidbody" /> on network objects.

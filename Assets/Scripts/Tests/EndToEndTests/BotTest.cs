@@ -1,7 +1,7 @@
 using LocalPlayer.Player;
 using UnityEngine;
 
-namespace Test
+namespace Tests.EndToEndTests
 {
     public class BotTest : MonoBehaviour
     {
