@@ -4,11 +4,6 @@ namespace LocalPlayer.Player
 {
     public class PlayerCameraController : MonoBehaviour
     {
-        [Header("Camera")]
-        [Tooltip("The sensitivity of the camera")]
-        [SerializeField]
-        private float sensitivity = 0.1f;
-
         [Tooltip("The character movement")]
         [SerializeField]
         private CharacterMovement characterMovement;
@@ -32,15 +27,15 @@ namespace LocalPlayer.Player
 
         private void Update()
         {
-            _xRotation -= LookInput.y * sensitivity;
+            LookInput = characterMovement.LookInput;
+
+            _xRotation -= LookInput.y;
             _xRotation = Mathf.Clamp(_xRotation, minimumAngle, maximumAngle);
 
             var localRotation = transform.localRotation;
 
             localRotation = Quaternion.Euler(_xRotation, localRotation.eulerAngles.y, localRotation.eulerAngles.z);
             transform.localRotation = localRotation;
-
-            characterMovement.Transform.Rotate(LookInput.x * sensitivity * Vector3.up);
         }
 
         private void OnDrawGizmos()

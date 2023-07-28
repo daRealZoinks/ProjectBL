@@ -39,6 +39,24 @@ namespace LocalPlayer.Player
         [SerializeField]
         private LayerMask groundLayerMask;
 
+        private NetworkRole _networkRole;
+
+
+
+        private const int BUFFER_SIZE = 1024;
+        private InputPayload[] _inputBuffer = new InputPayload[BUFFER_SIZE];
+        private StatePayload[] _stateBuffer = new StatePayload[BUFFER_SIZE];
+
+        private NetworkVariable<StatePayload> _latestState = new();
+        private StatePayload _previousState = new();
+
+
+
+
+
+
+
+
         public float Acceleration => acceleration;
         public float Deceleartion => deceleartion;
         public float MaxSpeed => maxSpeed;
@@ -52,7 +70,11 @@ namespace LocalPlayer.Player
         public Vector3 Velocity => Rigidbody ? Rigidbody.velocity : Vector3.zero;
         public bool MovementEnabled { get; set; } = true;
         public Vector2 MovementInput { get; set; }
+        public Vector2 LookInput { get; set; }
         public bool Stopping => MovementInput == Vector2.zero;
+
+
+        #region Logic
 
         private void Awake()
         {
@@ -64,38 +86,16 @@ namespace LocalPlayer.Player
             OnJump += CharacterMovement_OnJump;
         }
 
-        public override void OnNetworkSpawn()
-        {
-            NetworkManager.NetworkTickSystem.Tick += NetworkTickSystem_Tick;
-        }
-
-        private void NetworkTickSystem_Tick()
-        {
-            if (!IsServer && !IsClient) return;
-
-            float physicsFrequency = 1 / Time.fixedDeltaTime;
-            float elapsedTicks = physicsFrequency / NetworkManager.NetworkTickSystem.TickRate;
-
-            if (MovementEnabled) Move(MovementInput, elapsedTicks);
-            ApplyGravity(gravityScale);
-        }
-
         private void FixedUpdate()
         {
             if (IsClient || IsServer) return;
 
-            if (MovementEnabled) Move(MovementInput);
-            ApplyGravity(gravityScale);
+            PerformMovement(MovementInput);
         }
 
-        private void ApplyGravity(float gravityScale, float deltaTime = 1.0f)
+        private void Update()
         {
-            Rigidbody.AddForce((gravityScale - 1) * deltaTime * Physics.gravity, ForceMode.Acceleration);
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            NetworkManager.NetworkTickSystem.Tick -= NetworkTickSystem_Tick;
+            PerformRotation(LookInput);
         }
 
         private void OnCollisionStay(Collision collision)
@@ -117,6 +117,17 @@ namespace LocalPlayer.Player
         private void OnCollisionExit(Collision collision)
         {
             IsGrounded = false;
+        }
+
+        private void PerformRotation(Vector2 lookInput, float deltaTime = 1.0f)
+        {
+            RotateY(lookInput.x * deltaTime);
+        }
+
+        private void PerformMovement(Vector2 movementInput, float deltaTime = 1.0f)
+        {
+            if (MovementEnabled) Move(movementInput, deltaTime);
+            ApplyGravity(gravityScale, deltaTime);
         }
 
         private void Move(Vector2 movementInput, float deltaTime = 1.0f)
@@ -149,6 +160,16 @@ namespace LocalPlayer.Player
             Rigidbody.AddForce(finalForce * deltaTime, ForceMode.Acceleration);
         }
 
+        public void RotateY(float angle)
+        {
+            Transform.Rotate(Vector3.up, angle);
+        }
+
+        private void ApplyGravity(float gravityScale, float deltaTime = 1.0f)
+        {
+            Rigidbody.AddForce((gravityScale - 1) * deltaTime * Physics.gravity, ForceMode.Acceleration);
+        }
+
         public void Jump()
         {
             OnJump?.Invoke();
@@ -173,6 +194,117 @@ namespace LocalPlayer.Player
 
             Rigidbody.AddForce(jumpForce, ForceMode.VelocityChange);
         }
+
+        #endregion
+
+
+        #region Networking
+
+        public override void OnNetworkSpawn()
+        {
+            NetworkManager.NetworkTickSystem.Tick += NetworkTickSystem_Tick;
+            _latestState.OnValueChanged += LatestState_OnValueChanged;
+        }
+
+        private void LatestState_OnValueChanged(StatePayload previousValue, StatePayload newValue)
+        {
+            _previousState = previousValue;
+
+            if (Vector3.Distance(previousValue.Position, newValue.Position) > 0.001f)
+            {
+                float physicsFrequency = 1 / Time.fixedDeltaTime;
+                float elapsedTicks = physicsFrequency / NetworkManager.NetworkTickSystem.TickRate;
+
+                Transform.position = newValue.Position;
+                Rigidbody.velocity = newValue.Velocity;
+
+                for (var i = _latestState.Value.Tick; i < NetworkManager.LocalTime.Tick; i++)
+                {
+                    var input = _inputBuffer[i % BUFFER_SIZE];
+
+                    PerformMovement(input.MoveInput, elapsedTicks);
+
+                    StatePayload statePayload = new()
+                    {
+                        Tick = NetworkManager.LocalTime.Tick,
+                        Position = Transform.position,
+                        Rotation = Transform.rotation,
+                        Velocity = Rigidbody.velocity,
+                    };
+
+                    _stateBuffer[NetworkManager.LocalTime.Tick % BUFFER_SIZE] = statePayload;
+                }
+            }
+        }
+
+        private void NetworkTickSystem_Tick()
+        {
+            float physicsFrequency = 1 / Time.fixedDeltaTime;
+            float frameRate = 1 / Time.deltaTime;
+            float elapsedTicks = physicsFrequency / NetworkManager.NetworkTickSystem.TickRate;
+
+            if (IsOwner)
+            {
+                var bufferIndex = NetworkManager.LocalTime.Tick % BUFFER_SIZE;
+
+                InputPayload inputPayload = new()
+                {
+                    Tick = NetworkManager.LocalTime.Tick,
+                    MoveInput = MovementInput,
+                    LookInput = LookInput,
+                    JumpInput = false
+                };
+
+                StatePayload statePayload = new()
+                {
+                    Tick = NetworkManager.LocalTime.Tick,
+                    Position = Transform.position,
+                    Rotation = Transform.rotation,
+                    Velocity = Rigidbody.velocity,
+                };
+
+                _inputBuffer[bufferIndex] = inputPayload;
+                _stateBuffer[bufferIndex] = statePayload;
+
+                PerformMovement(MovementInput, elapsedTicks);
+                PerformMovementServerRpc(inputPayload);
+            }
+        }
+
+        [ServerRpc]
+        private void PerformMovementServerRpc(InputPayload inputPayload)
+        {
+            if (IsOwner) return;
+
+            float physicsFrequency = 1 / Time.fixedDeltaTime;
+            float elapsedSeconds = physicsFrequency / NetworkManager.NetworkTickSystem.TickRate;
+
+            if (NetworkManager.LocalTime.Tick != _previousState.Tick)
+            {
+                // we've lost a tick, so we need to perform a correction
+            }
+
+            PerformMovement(inputPayload.MoveInput, elapsedSeconds);
+
+            StatePayload statePayload = new()
+            {
+                Tick = NetworkManager.LocalTime.Tick,
+                Position = Transform.position,
+                Rotation = Transform.rotation,
+                Velocity = Rigidbody.velocity,
+            };
+
+            _previousState = _latestState.Value;
+            _latestState.Value = statePayload;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            NetworkManager.NetworkTickSystem.Tick -= NetworkTickSystem_Tick;
+            _latestState.OnValueChanged -= LatestState_OnValueChanged;
+        }
+
+        #endregion
 
         private void OnDrawGizmos()
         {

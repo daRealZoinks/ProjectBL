@@ -16055,10 +16055,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5902813274964911934, guid: 98f34d128dade8c42bb17e8844294117,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 6333161458435596379, guid: 98f34d128dade8c42bb17e8844294117,
         type: 3}
       propertyPath: GlobalObjectIdHash
       value: 1514275797
+      objectReference: {fileID: 0}
+    - target: {fileID: 8429725132591404132, guid: 98f34d128dade8c42bb17e8844294117,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2419284980
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

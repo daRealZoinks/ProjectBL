@@ -55,7 +55,8 @@ namespace LocalPlayer.Player
                 _ => Vector2.zero
             };
 
-            playerCameraController.LookInput = value;
+            _characterMovement.LookInput = value;
+            // playerCameraController.LookInput = value;
         }
 
 

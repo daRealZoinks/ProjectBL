@@ -46,32 +46,13 @@ namespace LocalPlayer.Player
         ///     The data the server has predicted
         /// </summary>
         StatePayload PredictionData_Server { get; }
+    }
 
-
-        /// <summary>
-        ///     Accessor to check if there is already client data, without potentially allocating it on demand.
-        /// </summary>
-        /// <returns> If there is already client data. </returns>
-        bool HasPredictionData_Client();
-
-
-        /// <summary>
-        ///     Accessor to check if there is already server data, without potentially allocating it on demand.
-        /// </summary>
-        /// <returns> If there is already server data. </returns>
-        bool HasPredictionData_Server();
-
-
-        /// <summary>
-        ///     Resets client prediction data.
-        /// </summary>
-        void ResetPredictionData_Client();
-
-
-        /// <summary>
-        ///     Resets server prediction data.
-        /// </summary>
-        void ResetPredictionData_Server();
+    public enum NetworkRole
+    {
+        AutonomousProxy,
+        Authority,
+        SimulatedProxy
     }
 
     public struct InputPayload : INetworkSerializable
@@ -104,10 +85,24 @@ namespace LocalPlayer.Player
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            serializer.SerializeValue(ref _tick);
-            serializer.SerializeValue(ref _moveInput);
-            serializer.SerializeValue(ref _lookInput);
-            serializer.SerializeValue(ref _jumpInput);
+            if (serializer.IsReader)
+            {
+                var reader = serializer.GetFastBufferReader();
+
+                reader.ReadValueSafe(out _tick);
+                reader.ReadValueSafe(out _moveInput);
+                reader.ReadValueSafe(out _lookInput);
+                reader.ReadValueSafe(out _jumpInput);
+            }
+            else
+            {
+                var writer = serializer.GetFastBufferWriter();
+
+                writer.WriteValueSafe(_tick);
+                writer.WriteValueSafe(_moveInput);
+                writer.WriteValueSafe(_lookInput);
+                writer.WriteValueSafe(_jumpInput);
+            }
         }
     }
 
@@ -117,7 +112,6 @@ namespace LocalPlayer.Player
         private Vector3 _position;
         private Quaternion _rotation;
         private Vector3 _velocity;
-        private bool _isMoving;
 
         public int Tick
         {
@@ -139,11 +133,6 @@ namespace LocalPlayer.Player
             readonly get => _velocity;
             set => _velocity = value;
         }
-        public bool IsMoving
-        {
-            readonly get => _isMoving;
-            set => _isMoving = value;
-        }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
@@ -155,7 +144,6 @@ namespace LocalPlayer.Player
                 reader.ReadValueSafe(out _position);
                 reader.ReadValueSafe(out _rotation);
                 reader.ReadValueSafe(out _velocity);
-                reader.ReadValueSafe(out _isMoving);
             }
             else
             {
@@ -165,7 +153,6 @@ namespace LocalPlayer.Player
                 writer.WriteValueSafe(_position);
                 writer.WriteValueSafe(_rotation);
                 writer.WriteValueSafe(_velocity);
-                writer.WriteValueSafe(_isMoving);
             }
         }
     }
