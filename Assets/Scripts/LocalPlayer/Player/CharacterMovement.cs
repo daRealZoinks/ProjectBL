@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Cinemachine;
+using System;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
@@ -8,73 +10,60 @@ namespace LocalPlayer.Player
     [RequireComponent(typeof(Rigidbody))]
     public class CharacterMovement : NetworkBehaviour
     {
-        [Header("Movement")]
-        [SerializeField]
-        private float acceleration = 64f; // m/s
+        [field: Header("Movement")]
+        [field: SerializeField]
+        public float Acceleration { get; set; } = 64f;
 
-        [SerializeField]
-        private float deceleartion = 128f; // m/s
+        [field: SerializeField]
+        public float Deceleartion { get; set; } = 128f;
 
-        [SerializeField]
-        private float maxSpeed = 13f; // m/s
+        [field: SerializeField]
+        public float MaxSpeed { get; set; } = 13f;
 
-        [Space]
-        [Header("Jump")]
-        [SerializeField]
-        private float jumpHeight = 3f; // m
+        [field: Space]
+        [field: Header("Jump")]
+        [field: SerializeField]
+        public float JumpHeight { get; set; } = 3f;
 
-        [SerializeField]
-        private float gravityScale = 1.5f;
+        [field: SerializeField]
+        private float GravityScale { get; set; } = 1.5f;
 
-        [SerializeField]
-        [Range(0, 1f)]
-        private float airControl = 0.1f; // %
+        [field: SerializeField]
+        [field: Range(0, 1f)]
+        public float AirControl { get; set; } = 0.1f;
 
-        [SerializeField]
-        [Range(0, 1f)]
-        private float airBrake = 0f; // %
+        [field: SerializeField]
+        [field: Range(0, 1f)]
+        public float AirBrake { get; set; } = 0f;
 
-        [Space]
-        [Header("Grounding")]
-        [SerializeField]
-        private LayerMask groundLayerMask;
+        [field: Space]
+        [field: Header("Grounding")]
+        [field: SerializeField]
+        public LayerMask GroundLayerMask { get; set; }
 
-        private NetworkRole _networkRole;
-
-
+        [field: Space]
+        [field: Header("Camera")]
+        [field: SerializeField]
+        public CinemachineVirtualCamera CinemachineVirtualCamera { get; set; }
 
         private const int BUFFER_SIZE = 1024;
-        private InputPayload[] _inputBuffer = new InputPayload[BUFFER_SIZE];
-        private StatePayload[] _stateBuffer = new StatePayload[BUFFER_SIZE];
+        private readonly InputPayload[] _inputBuffer = new InputPayload[BUFFER_SIZE];
+        private readonly StatePayload[] _stateBuffer = new StatePayload[BUFFER_SIZE];
 
-        private NetworkVariable<StatePayload> _latestState = new();
+        private readonly NetworkVariable<StatePayload> _latestState = new();
         private StatePayload _previousState = new();
 
-
-
-
-
-
-
-
-        public float Acceleration => acceleration;
-        public float Deceleartion => deceleartion;
-        public float MaxSpeed => maxSpeed;
-        public float JumpHeight => jumpHeight;
-        public float AirControl => airControl;
-        public float AirBrake => airBrake;
-        public LayerMask GroundLayerMask => groundLayerMask;
-        public Transform Transform => transform;
         public Rigidbody Rigidbody { get; private set; }
         public bool IsGrounded { get; private set; }
         public Vector3 Velocity => Rigidbody ? Rigidbody.velocity : Vector3.zero;
         public bool MovementEnabled { get; set; } = true;
         public Vector2 MovementInput { get; set; }
-        public Vector2 LookInput { get; set; }
         public bool Stopping => MovementInput == Vector2.zero;
 
+        public delegate void OnLandedCallback(float fallSpeed);
 
-        #region Logic
+        public event UnityAction OnJump;
+        public event OnLandedCallback OnLanded;
 
         private void Awake()
         {
@@ -91,27 +80,12 @@ namespace LocalPlayer.Player
             if (IsClient || IsServer) return;
 
             PerformMovement(MovementInput);
-        }
-
-        private void Update()
-        {
-            PerformRotation(LookInput);
+            PerformRotation();
         }
 
         private void OnCollisionStay(Collision collision)
         {
-            IsGrounded = false;
-
-            for (var i = 0; i < collision.contactCount; i++)
-            {
-                var contactPoint = collision.GetContact(i);
-
-                if (Vector3.Dot(contactPoint.normal, Vector3.up) > 0.5f)
-                {
-                    IsGrounded = true;
-                    break;
-                }
-            }
+            IsGrounded = collision.contacts.Any(contactPoint => Vector3.Dot(contactPoint.normal, Vector3.up) > 0.5f);
         }
 
         private void OnCollisionExit(Collision collision)
@@ -119,22 +93,22 @@ namespace LocalPlayer.Player
             IsGrounded = false;
         }
 
-        private void PerformRotation(Vector2 lookInput, float deltaTime = 1.0f)
+        private void PerformRotation()
         {
-            RotateY(lookInput.x * deltaTime);
+            Rigidbody.rotation = Quaternion.Euler(0, CinemachineVirtualCamera.transform.eulerAngles.y, 0);
         }
 
         private void PerformMovement(Vector2 movementInput, float deltaTime = 1.0f)
         {
             if (MovementEnabled) Move(movementInput, deltaTime);
-            ApplyGravity(gravityScale, deltaTime);
+            ApplyGravity(GravityScale, deltaTime);
         }
 
         private void Move(Vector2 movementInput, float deltaTime = 1.0f)
         {
             Vector3 horizontalVelocity = new(Velocity.x, 0, Velocity.z);
 
-            Vector3 moveDirection = movementInput.x * Transform.right + movementInput.y * Transform.forward;
+            Vector3 moveDirection = movementInput.x * transform.right + movementInput.y * transform.forward;
             moveDirection.Normalize();
 
             Vector3 horizontalClampedVelocity = horizontalVelocity.normalized *
@@ -162,7 +136,7 @@ namespace LocalPlayer.Player
 
         public void RotateY(float angle)
         {
-            Transform.Rotate(Vector3.up, angle);
+            transform.Rotate(Vector3.up, angle);
         }
 
         private void ApplyGravity(float gravityScale, float deltaTime = 1.0f)
@@ -175,12 +149,6 @@ namespace LocalPlayer.Player
             OnJump?.Invoke();
         }
 
-        public delegate void OnLandedCallback(float fallSpeed);
-
-        public event UnityAction OnJump;
-
-        public event OnLandedCallback OnLanded;
-
         private void CharacterMovement_OnJump()
         {
             if (!IsGrounded) return;
@@ -189,21 +157,22 @@ namespace LocalPlayer.Player
 
             Vector3 jumpForce = new()
             {
-                y = Mathf.Sqrt(-2 * Physics.gravity.y * gravityScale * jumpHeight)
+                y = Mathf.Sqrt(-2 * Physics.gravity.y * GravityScale * JumpHeight)
             };
 
             Rigidbody.AddForce(jumpForce, ForceMode.VelocityChange);
         }
 
-        #endregion
-
-
-        #region Networking
-
         public override void OnNetworkSpawn()
         {
             NetworkManager.NetworkTickSystem.Tick += NetworkTickSystem_Tick;
             _latestState.OnValueChanged += LatestState_OnValueChanged;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            NetworkManager.NetworkTickSystem.Tick -= NetworkTickSystem_Tick;
+            _latestState.OnValueChanged -= LatestState_OnValueChanged;
         }
 
         private void LatestState_OnValueChanged(StatePayload previousValue, StatePayload newValue)
@@ -215,7 +184,7 @@ namespace LocalPlayer.Player
                 float physicsFrequency = 1 / Time.fixedDeltaTime;
                 float elapsedTicks = physicsFrequency / NetworkManager.NetworkTickSystem.TickRate;
 
-                Transform.position = newValue.Position;
+                transform.position = newValue.Position;
                 Rigidbody.velocity = newValue.Velocity;
 
                 for (var i = _latestState.Value.Tick; i < NetworkManager.LocalTime.Tick; i++)
@@ -223,12 +192,13 @@ namespace LocalPlayer.Player
                     var input = _inputBuffer[i % BUFFER_SIZE];
 
                     PerformMovement(input.MoveInput, elapsedTicks);
+                    PerformRotation();
 
                     StatePayload statePayload = new()
                     {
                         Tick = NetworkManager.LocalTime.Tick,
-                        Position = Transform.position,
-                        Rotation = Transform.rotation,
+                        Position = transform.position,
+                        Rotation = transform.rotation,
                         Velocity = Rigidbody.velocity,
                     };
 
@@ -251,21 +221,21 @@ namespace LocalPlayer.Player
                 {
                     Tick = NetworkManager.LocalTime.Tick,
                     MoveInput = MovementInput,
-                    LookInput = LookInput,
                     JumpInput = false
                 };
 
                 StatePayload statePayload = new()
                 {
                     Tick = NetworkManager.LocalTime.Tick,
-                    Position = Transform.position,
-                    Rotation = Transform.rotation,
+                    Position = transform.position,
+                    Rotation = transform.rotation,
                     Velocity = Rigidbody.velocity,
                 };
 
                 _inputBuffer[bufferIndex] = inputPayload;
                 _stateBuffer[bufferIndex] = statePayload;
 
+                PerformRotation();
                 PerformMovement(MovementInput, elapsedTicks);
                 PerformMovementServerRpc(inputPayload);
             }
@@ -281,45 +251,23 @@ namespace LocalPlayer.Player
 
             if (NetworkManager.LocalTime.Tick != _previousState.Tick)
             {
-                // we've lost a tick, so we need to perform a correction
+                transform.SetPositionAndRotation(_previousState.Position, _previousState.Rotation);
+                Rigidbody.velocity = _previousState.Velocity;
             }
 
+            PerformRotation();
             PerformMovement(inputPayload.MoveInput, elapsedSeconds);
 
             StatePayload statePayload = new()
             {
                 Tick = NetworkManager.LocalTime.Tick,
-                Position = Transform.position,
-                Rotation = Transform.rotation,
+                Position = transform.position,
+                Rotation = transform.rotation,
                 Velocity = Rigidbody.velocity,
             };
 
             _previousState = _latestState.Value;
             _latestState.Value = statePayload;
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            NetworkManager.NetworkTickSystem.Tick -= NetworkTickSystem_Tick;
-            _latestState.OnValueChanged -= LatestState_OnValueChanged;
-        }
-
-        #endregion
-
-        private void OnDrawGizmos()
-        {
-            // Draw the velocity
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(Transform.position, Transform.position + Velocity);
-
-            // Draw the movement input
-            Gizmos.color = Color.blue;
-            Vector3 movementInputLine = MovementInput.x * Transform.right + MovementInput.y * Transform.forward;
-            Gizmos.DrawLine(Transform.position, Transform.position + movementInputLine);
-
-            // Draw the ground check
-            Gizmos.color = IsGrounded ? Color.green : Color.red;
-            Gizmos.DrawWireSphere(Transform.position, 0.1f);
         }
     }
 }

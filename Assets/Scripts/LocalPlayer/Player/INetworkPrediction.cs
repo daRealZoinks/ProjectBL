@@ -48,13 +48,6 @@ namespace LocalPlayer.Player
         StatePayload PredictionData_Server { get; }
     }
 
-    public enum NetworkRole
-    {
-        AutonomousProxy,
-        Authority,
-        SimulatedProxy
-    }
-
     public struct InputPayload : INetworkSerializable
     {
         private int _tick;
@@ -71,11 +64,6 @@ namespace LocalPlayer.Player
         {
             readonly get => _moveInput;
             set => _moveInput = value;
-        }
-        public Vector2 LookInput
-        {
-            readonly get => _lookInput;
-            set => _lookInput = value;
         }
         public bool JumpInput
         {
